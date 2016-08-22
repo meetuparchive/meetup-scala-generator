@@ -12,25 +12,13 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
      * Arguments supported by this generator.
      */
     private enum Arg {
-        CLIENT_NAME("client", "The artfifact thing"),
+        CLIENT_NAME("client", "The artifact thing"),
         CLIENT_ORGANIZATION("com.meetup.client", "The org .."),
         CLIENT_VERSION("1.0.0", "The client version");
 
-        public String value() {
-            return value;
-        }
-
-        public String description() {
-            return description;
-        }
-
-        private final String value;
-        private final String description;
-        private final String argument;
-
-        public String argument() {
-            return argument;
-        }
+        public final String value;
+        public final String description;
+        public final String argument;
 
         Arg(String value, String description) {
             this.value = value;
@@ -62,21 +50,17 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
     }
 
     public String getHelp() {
-        return "Generates meetup-scala-client library.";
+        return "Generates " + getName() + " library.";
     }
 
     public ScalaClientCodegen() {
         super();
-        for (Arg a : Arg.values()) {
-            System.out.println(a.argument());
-        }
         // set the output folder here
         outputFolder = "generated-code/meetup-scala-client";
 
         for (Arg d : Arg.values()) {
-            cliOptions.add(CliOption.newString(d.argument(), d.description()));
+            cliOptions.add(CliOption.newString(d.argument, d.description));
         }
-
 
         /**
          * Models.  You can write model files using the modelTemplateFiles map.
@@ -140,7 +124,15 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
          * the client generator
          */
         languageSpecificPrimitives = new HashSet<String>(
-                Arrays.asList("List")
+                Arrays.asList(
+                        "Boolean",
+                        "Double",
+                        "Float",
+                        "Int",
+                        "Long",
+                        "List",
+                        "Map",
+                        "String")
         );
 
         instantiationTypes.put("date-time", "ZonedDateTime");
@@ -149,8 +141,9 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
         importMapping.put("ZonedDateTime", "java.time.ZonedDateTime");
 
         typeMapping = new HashMap<String, String>();
-        typeMapping.put("DateTime", "ZonedDateTime");
         typeMapping.put("array", "List");
+        typeMapping.put("DateTime", "ZonedDateTime");
+        typeMapping.put("long", "Long");
 
         importMapping.put("Date", "LocalDate");
     }
@@ -159,9 +152,9 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
     public void processOpts() {
         super.processOpts();
         for (Arg arg : Arg.values()) {
-            Object _value = additionalProperties.get(arg.argument());
-            String value = _value == null ? arg.value() : _value.toString();
-            additionalProperties.put(arg.argument(), value);
+            Object _value = additionalProperties.get(arg.argument);
+            String value = _value == null ? arg.value : _value.toString();
+            additionalProperties.put(arg.argument, value);
         }
     }
 
