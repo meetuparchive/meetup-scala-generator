@@ -4,10 +4,5 @@ package {{package}}
 {{/imports}}
 {{#models}}
 {{#model}}{{#description}}/* {{{description}}} */{{/description}}
-{{^isEnum}}final case class {{classname}} (
-{{#vars}}{{#description}}/* {{{description}}} */
-{{/description}}  {{name}}: {{#required}}{{{datatype}}}{{/required}}{{^required}}Option[{{{datatype}}}]{{/required}}{{#hasMore}},{{/hasMore}}{{^hasMore}}){{/hasMore}}
-{{/vars}}{{/isEnum}}
-{{#isEnum}}sealed trait {{classname}}
-{{#allowableValues}}{{#values}}case object {{.}} extends {{classname}}
-{{/values}}{{/allowableValues}}{{/isEnum}}{{/model}}{{/models}}
+{{#isEnum}}{{>modelEnum}}{{/isEnum}}{{^isEnum}}{{>modelClass}}{{/isEnum}}
+{{/model}}{{/models}}

@@ -1,0 +1,4 @@
+final case class {{classname}} (
+{{#vars}}{{#description}}/* {{{description}}} */
+{{/description}}  {{name}}: {{#required}}{{{datatype}}}{{/required}}{{^required}}Option[{{{datatype}}}]{{/required}}{{#hasMore}},{{/hasMore}}{{^hasMore}}){{/hasMore}}
+{{/vars}}

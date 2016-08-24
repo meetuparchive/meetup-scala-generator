@@ -1,3 +1,5 @@
+## Running the Code Generator
+
 Clone this repository, `cd` to the resulting project directory, and then build
 the Meetup service client code generator:
 
@@ -15,3 +17,11 @@ This uses the `swagger-codegen` script to run the [swagger-codegen CLI](https://
 which is included in the same directory for convenience.
 
 Now you can poke around the generated source in the `generated` directory.
+
+## Interpretation of the OpenAPI Specification
+
+This generator is intended to target API specification files adhering to the [OpenAPI version 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).
+
+### Treatment of `enum`
+
+The OpenAPI specification defers to the [JSON-Schema Draft 4] for its treatment of [`enum`](http://json-schema.org/latest/json-schema-validation.html#anchor76).
