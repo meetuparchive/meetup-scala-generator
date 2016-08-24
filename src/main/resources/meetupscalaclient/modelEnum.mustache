@@ -1,3 +1,17 @@
-sealed trait {{classname}}
-{{#allowableValues}}{{#values}}case object {{.}} extends {{classname}}
-{{/values}}{{/allowableValues}}
+sealed abstract class {{classname}}(val value: {{dataType}}) extends Product with Serializable
+{{#allowableValues}}{{#enumVars}}case object {{name}} extends {{classname}}({{{value}}})
+{{/enumVars}}{{/allowableValues}}
+object {{classname}} {
+  private val valueMap = Map({{#allowableValues}}{{#enumVars}}{{{value}}} -> {{name}}{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}})
+
+  /**
+   * The set of `{{classname}}` instances.
+   */
+  val values: Set[{{classname}}] = valueMap.values.toSet
+
+  /**
+   * Get the `{{classname}}` instance mapped by the given {{dataType}} value,
+   * if there is one.
+   */
+  def fromValue(value: {{dataType}}): Option[{{classname}}] = valueMap.get(value)
+}

@@ -8,6 +8,12 @@ import java.io.File;
 
 public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig {
 
+    private static final Set<String> NUMBER_TYPES = new HashSet<String>();
+
+    static {
+        NUMBER_TYPES.addAll(Arrays.asList("Integer", "Long", "Float", "Double"));
+    }
+
     /**
      * Arguments supported by this generator.
      */
@@ -55,6 +61,7 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
 
     public ScalaClientCodegen() {
         super();
+
         // set the output folder here
         outputFolder = "generated-code/meetup-scala-client";
 
@@ -229,9 +236,9 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
         return toModelName(type);
     }
 
-    @Override // lifted from ScalaClientCodegen
+    @Override
     public Map<String, Object> postProcessModels(Map<String, Object> objs) {
-        // remove model imports to avoid warnings for importing class in the same package in Scala
+        // import sanitization lifted from ScalaClientCodegen
         List<Map<String, String>> imports = (List<Map<String, String>>) objs.get("imports");
         final String prefix = modelPackage() + ".";
         Iterator<Map<String, String>> iterator = imports.iterator();
@@ -239,10 +246,26 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
             String _import = iterator.next().get("import");
             if (_import.startsWith(prefix)) iterator.remove();
         }
-        return objs;
+
+        // Now subject the models to Enum treatment.
+        return postProcessModelsEnum(objs);
     }
 
-//    public Map<String, Object> postProcessModelsEnum(Map<String, Object> objs) {
-//        return null;
-//    }
+    @Override
+    public String toEnumVarName(String value, String datatype) {
+        if (NUMBER_TYPES.contains(datatype)) {
+            return "Number" + value;
+        } else {
+            return value;
+        }
+    }
+
+    @Override // lifted from AbstractJavaCodegen
+    public String toEnumValue(String value, String datatype) {
+        if (NUMBER_TYPES.contains(datatype)) {
+            return value;
+        } else {
+            return "\"" + escapeText(value).toLowerCase() + "\"";
+        }
+    }
 }
