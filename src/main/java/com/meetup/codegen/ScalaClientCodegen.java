@@ -260,7 +260,7 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
         }
     }
 
-    @Override // lifted from AbstractJavaCodegen
+    @Override
     public String toEnumValue(String value, String datatype) {
         if (NUMBER_TYPES.contains(datatype)) {
             return value;
