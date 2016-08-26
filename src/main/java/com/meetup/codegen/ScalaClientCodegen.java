@@ -1,14 +1,23 @@
 package com.meetup.codegen;
 
 import io.swagger.codegen.*;
-import io.swagger.models.properties.*;
+import io.swagger.models.properties.ArrayProperty;
+import io.swagger.models.properties.MapProperty;
+import io.swagger.models.properties.Property;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
 import java.io.File;
+import java.util.*;
 
 public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig {
 
     private static final Set<String> NUMBER_TYPES = new HashSet<String>();
+
+    public static Set<String> getNumberTypes() {
+        Set<String> copy = new HashSet<String>();
+        copy.addAll(NUMBER_TYPES);
+        return copy;
+    }
 
     static {
         NUMBER_TYPES.addAll(Arrays.asList("Integer", "Long", "Float", "Double"));
@@ -252,11 +261,29 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
     }
 
     @Override
+    public String toEnumName(CodegenProperty property) {
+        return camelize(property.name.split("_"));
+    }
+
+//    @Override
+//    public String toEnumDefaultValue(String value, String datatype) {
+//        return datatype + "." + value;
+//    }
+
+    public static String camelize(String[] parts) {
+        StringBuilder sb = new StringBuilder();
+        for(String s : parts) {
+            sb.append(StringUtils.capitalize(s));
+        }
+        return sb.toString();
+    }
+
+    @Override
     public String toEnumVarName(String value, String datatype) {
         if (NUMBER_TYPES.contains(datatype)) {
             return "Number" + value;
         } else {
-            return value;
+            return camelize(value.split("[ _]"));
         }
     }
 
