@@ -2,7 +2,12 @@ sealed abstract class {{classname}}(val value: {{dataType}}) extends Product wit
 {{#allowableValues}}{{#enumVars}}case object {{name}} extends {{classname}}({{{value}}})
 {{/enumVars}}{{/allowableValues}}
 object {{classname}} {
-  private val valueMap = Map({{#allowableValues}}{{#enumVars}}{{{value}}} -> {{name}}{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}})
+
+  private val valueMap =
+    Map(
+      {{#allowableValues}}{{#enumVars}}{{{value}}} -> {{name}}{{^-last}},
+      {{/-last}}{{/enumVars}}
+    {{/allowableValues}})
 
   /**
    * The set of `{{classname}}` instances.
