@@ -1,7 +1,7 @@
-sealed abstract class {{classname}}(val value: {{dataType}}) extends Product with Serializable
-{{#allowableValues}}{{#enumVars}}case object {{name}} extends {{classname}}({{{value}}})
+sealed abstract class {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}(val value: {{#dataType}}{{.}}{{/dataType}}{{^dataType}}{{datatype}}{{/dataType}}) extends Product with Serializable
+{{#allowableValues}}{{#enumVars}}case object {{name}} extends {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}({{{value}}})
 {{/enumVars}}{{/allowableValues}}
-object {{classname}} {
+object {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}} {
 
   private val valueMap =
     Map(
@@ -10,13 +10,13 @@ object {{classname}} {
     {{/allowableValues}})
 
   /**
-   * The set of `{{classname}}` instances.
+   * The set of `{{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}` instances.
    */
-  val values: Set[{{classname}}] = valueMap.values.toSet
+  val values: Set[{{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}] = valueMap.values.toSet
 
   /**
-   * Get the `{{classname}}` instance mapped by the given {{dataType}} value,
+   * Get the `{{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}` instance mapped by the given {{#dataType}}{{.}}{{/dataType}}{{^dataType}}{{datatype}}{{/dataType}} value,
    * if there is one.
    */
-  def fromValue(value: {{dataType}}): Option[{{classname}}] = valueMap.get(value)
+  def fromValue(value: {{#dataType}}{{.}}{{/dataType}}{{^dataType}}{{datatype}}{{/dataType}}): Option[{{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}] = valueMap.get(value)
 }

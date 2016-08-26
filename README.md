@@ -25,3 +25,63 @@ This generator is intended to target API specification files adhering to the [Op
 ### Treatment of `enum`
 
 The OpenAPI specification defers to the [JSON-Schema Draft 4] for its treatment of [`enum`](http://json-schema.org/latest/json-schema-validation.html#anchor76).
+
+```yaml
+  psp:
+    description: The payment service provider.
+    type: string
+    enum:
+      - apple
+      - stripe
+```
+
+```scala
+sealed abstract class Psp(val value: String) extends Product with Serializable
+case object Apple extends Psp("apple")
+case object Stripe extends Psp("stripe")
+
+object Psp {
+  private val valueMap =
+    Map(
+      "apple" -> Apple,
+      "stripe" -> Stripe
+    )
+
+  val values: Set[Psp] = valueMap.values.toSet
+  
+  def fromValue(value: String): Option[Psp] = valueMap.get(value)
+}
+```
+
+```yaml
+  subscription:
+    description: A Subscription.
+    properties:
+      psp:
+        type: string
+        enum:
+          - apple
+          - stripe
+```
+
+```scala
+final case class Subscription(psp: Option[Subscription.Psp])
+ 
+object Subscription {
+  sealed abstract class Psp(val value: String) extends Product with Serializable
+  case object Apple extends Psp("apple")
+  case object Stripe extends Psp("stripe")
+
+  object Psp {
+    private val valueMap =
+      Map(
+        "apple" -> Apple,
+        "stripe" -> Stripe
+      )
+    
+    val values: Set[Psp] = valueMap.values.toSet
+    
+    def fromValue(value: String): Option[Psp] = valueMap.get(value)
+  }
+}
+```

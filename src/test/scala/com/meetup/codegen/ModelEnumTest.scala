@@ -29,8 +29,6 @@ class ModelEnumTest extends FunSpec with Matchers {
      *       enum:
      *         - 1
      *         - 2
-     *
-     *
      */
 
     /* Build up the unprocessed model. */

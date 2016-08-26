@@ -1,4 +1,8 @@
 final case class {{classname}} (
 {{#vars}}{{#description}}/* {{{description}}} */
-{{/description}}  {{name}}: {{#required}}{{{datatype}}}{{/required}}{{^required}}Option[{{{datatype}}}]{{/required}}{{#hasMore}},{{/hasMore}}{{^hasMore}}){{/hasMore}}
-{{/vars}}
+{{/description}}  {{name}}: {{#required}}{{#isEnum}}{{classname}}.{{datatypeWithEnum}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}{{/required}}{{^required}}Option[{{#isEnum}}{{classname}}.{{datatypeWithEnum}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}]{{/required}}{{#hasMore}},{{/hasMore}}{{^hasMore}}){{/hasMore}}
+{{/vars}}{{#hasEnums}}
+object {{classname}} {
+  {{#vars}}{{#isEnum}}{{>modelEnum}}{{/isEnum}}{{/vars}}
+}
+{{/hasEnums}}
