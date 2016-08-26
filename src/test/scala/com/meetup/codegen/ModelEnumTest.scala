@@ -63,6 +63,7 @@ class ModelEnumTest extends FunSpec with Matchers {
 
     it("should have enum instance names properly mangled") {
       properties.foreach { property =>
+
         val rawAllowedValues =
           property
             .allowableValues.get("values")
@@ -83,6 +84,28 @@ class ModelEnumTest extends FunSpec with Matchers {
             .map(_.get("name"))
 
         actualNames.forall(expectedNames.contains) shouldBe true}
+    }
+
+    it("should have enum instance values properly escaped") {
+      properties.foreach { property =>
+        val rawAllowedValues =
+          property
+            .allowableValues.get("values")
+            .asInstanceOf[JList[AnyRef]]
+            .asScala
+            .map(_.toString)
+
+        val actualValues =
+          property
+            .allowableValues.get("enumVars")
+            .asInstanceOf[JList[JMap[String, String]]]
+            .asScala
+            .map(_.get("value"))
+
+        rawAllowedValues.zip(actualValues).foreach {
+          case (raw, actual) => actual shouldBe codeGen.toEnumValue(raw, property.datatype)
+        }
+      }
     }
   }
 }
