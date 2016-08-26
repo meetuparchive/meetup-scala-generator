@@ -7,7 +7,7 @@ import io.swagger.models.properties.{IntegerProperty, StringProperty}
 import org.scalatest.{FunSpec, Matchers}
 import scala.collection.JavaConverters._
 
-class ScalaModelEnumTest extends FunSpec with Matchers {
+class ModelEnumTest extends FunSpec with Matchers {
 
   val codeGen = new ScalaClientCodegen()
 
@@ -36,49 +36,53 @@ class ScalaModelEnumTest extends FunSpec with Matchers {
     m
   }
 
+  val properties = generatedModel.vars.asScala.toList
+
   describe("a generated model with enum properties") {
     it("should have the expected number of properties") {
-      generatedModel.vars.size() shouldBe 2
+      properties.length shouldBe 2
     }
 
     it("should have only enum properties") {
-      generatedModel.vars.asScala.forall(_.isEnum == true) shouldBe true
+      properties.forall(_.isEnum == true) shouldBe true
     }
 
     it("should have an enum whose baseType is \"String\"") {
-      val property = generatedModel.vars.get(0)
-      property.baseType shouldBe "String"
+      properties.exists(_.baseType == "String") shouldBe true
     }
 
     it("should have an enum whose baseType is \"Integer\"") {
-      val property = generatedModel.vars.get(1)
-      property.baseType shouldBe "Integer"
+      properties.exists(_.baseType == "Integer") shouldBe true
+    }
+  }
+
+  describe("generated enum properties") {
+    it("should have enum names properly mangled") {
+      properties.forall(p => p.datatypeWithEnum == codeGen.toEnumName(p)) shouldBe true
     }
 
     it("should have enum instance names properly mangled") {
-      val property = generatedModel.vars.get(1)
+      properties.foreach { property =>
+        val rawAllowedValues =
+          property
+            .allowableValues.get("values")
+            .asInstanceOf[JList[AnyRef]]
+            .asScala
+            .map(_.toString)
 
-      val rawAllowedValues =
-        property
-          .allowableValues.get("values")
-          .asInstanceOf[JList[AnyRef]]
-          .asScala
-          .map(_.toString)
+        val expectedNames =
+          rawAllowedValues.map { v =>
+            codeGen.toEnumVarName(v, property.baseType)
+          }.toSet
 
-      val expectedNames =
-        rawAllowedValues.map { v =>
-          codeGen.toEnumVarName(v, property.baseType)
-        }.toSet
+        val actualNames =
+          property
+            .allowableValues.get("enumVars")
+            .asInstanceOf[JList[JMap[String, String]]]
+            .asScala
+            .map(_.get("name"))
 
-      val actualNames =
-        property
-          .allowableValues.get("enumVars")
-          .asInstanceOf[JList[JMap[String, String]]]
-          .asScala
-          .toList
-          .map(_.get("name"))
-
-      actualNames.forall(expectedNames.contains) shouldBe true
+        actualNames.forall(expectedNames.contains) shouldBe true}
     }
   }
 }
