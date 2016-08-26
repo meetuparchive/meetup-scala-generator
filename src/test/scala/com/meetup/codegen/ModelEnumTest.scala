@@ -12,6 +12,29 @@ class ModelEnumTest extends FunSpec with Matchers {
   val codeGen = new ScalaClientCodegen()
 
   val generatedModel = {
+
+    /*
+     * This block first builds up model as it would be parsed from a Swagger
+     * specification file. The actual YAML text would be:
+     *
+     * unnamed_model:
+     *   properties:
+     *     some_strings:
+     *       type: string
+     *         enum:
+     *           - apple
+     *           - stripe
+     *     some_ints:
+     *       type: integer
+     *       enum:
+     *         - 1
+     *         - 2
+     *
+     *
+     */
+
+    /* Build up the unprocessed model. */
+
     val stringEnumProperty = new StringProperty
     stringEnumProperty.setEnum(JArrays.asList("apple", "stripe"))
 
@@ -22,10 +45,16 @@ class ModelEnumTest extends FunSpec with Matchers {
       .property("some_strings", stringEnumProperty)
       .property("some_ints", intEnumProperty)
 
-    val m = codeGen.fromModel("test", model)
+    /*
+     * Now push the model through the relevant processing stages. Note that
+     * before post processing we need to set up a map structure as expected
+     * by that phase. Our generator does post processing on the "imports",
+     * so we provide an empty list to avoid an irrelevant failure.
+     */
 
+    val codeGenModel = codeGen.fromModel("test", model)
     val modelProps = new JHashMap[String, AnyRef]()
-    modelProps.put("model", m)
+    modelProps.put("model", codeGenModel)
 
     val root = new JHashMap[String, AnyRef]()
     root.put("imports", Collections.emptyList[Map[String, String]]())
@@ -33,7 +62,15 @@ class ModelEnumTest extends FunSpec with Matchers {
 
     codeGen.postProcessModels(root)
 
-    m
+    /*
+     * The Swagger codegen tool uses a mutable model throughout the generation
+     * process. Here, post processing actually mutates the inners of the
+     * resulting CodegenModel to add enum-specific properties. This is worth
+     * noting as, has we not run it through postProcessModels, the tests on
+     * those properties would fail.
+     */
+
+    codeGenModel
   }
 
   val properties = generatedModel.vars.asScala.toList
