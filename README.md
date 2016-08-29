@@ -25,6 +25,19 @@ This generator is intended to target API specification files adhering to the [Op
 ### Treatment of `enum`
 
 The OpenAPI specification defers to the [JSON-Schema Draft 4] for its treatment of [`enum`](http://json-schema.org/latest/json-schema-validation.html#anchor76).
+We currently support both standalone definitions defined as enums themselves as well as inline enums.
+
+Enum values must be heterogeneous. Supported value types are a subset of that allowed in JSON-schema, for simplicity's sake.
+Specifically, these are: `boolean`, `integer`, `number`, and `string`.
+
+The code generation strategy for both standalone and embedded enums is the same:
+
+- sealed type hierarchy
+- instances as case objects with both the `toString` and `value` members rendering the original value.
+- a companion with the instances available as a `Set`, as well as a function, `fromValue`, for translating a raw value
+- into an instance
+
+Consider this standalone example:
 
 ```yaml
   psp:
@@ -34,6 +47,8 @@ The OpenAPI specification defers to the [JSON-Schema Draft 4] for its treatment 
       - apple
       - stripe
 ```
+
+This would result in the following scala code:
 
 ```scala
 sealed abstract class Psp(val value: String) extends Product with Serializable
@@ -53,6 +68,8 @@ object Psp {
 }
 ```
 
+Consider this embedded example:
+
 ```yaml
   subscription:
     description: A Subscription.
@@ -63,6 +80,8 @@ object Psp {
           - apple
           - stripe
 ```
+
+This would result in the following scala code:
 
 ```scala
 final case class Subscription(psp: Option[Subscription.Psp])
@@ -85,3 +104,6 @@ object Subscription {
   }
 }
 ```
+
+Note that we infer the root enum type from the property name. We also place the hierarchy within the companion object of
+the class generated to represent the containing model in the specification.
