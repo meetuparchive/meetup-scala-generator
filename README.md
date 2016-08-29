@@ -107,3 +107,83 @@ object Subscription {
 
 Note that we infer the root enum type from the property name. We also place the hierarchy within the companion object of
 the class generated to represent the containing model in the specification.
+
+### Handling sub-type polymorphism
+
+```yaml
+  Shape:
+    type: object
+    discriminator: shapeType
+    properties:
+      name:
+        type: string
+      shapeType:
+        type: string
+    required:
+      - name
+      - shapeType
+  Triangle:
+    description: A representation of a triangle
+    allOf:
+    - $ref: '#/definitions/Shape'
+    - type: object
+      properties:
+        base:
+          type: integer
+          description: The base length
+        height:
+          type: integer
+          description: The height
+      required:
+        - base
+        - height
+  Rectangle:
+    description: A representation of a rectangle
+    allOf:
+    - $ref: '#/definitions/Shape'
+    - type: object
+      properties:
+        length:
+          type: integer
+          description: The length of the rectangle
+        width:
+          type: integer
+          description: The width of the rectangle
+      required:
+        - length
+        - width
+```
+
+```scala
+trait Shape {
+  def name: String
+
+  def shapeType: String
+}
+```
+
+```scala
+/**
+ * A representation of a triangle
+ */
+final case class Triangle (
+  name: String,
+  shapeType: String,
+  /* The base length */
+  base: Int,
+  /* The height */
+  height: Int) extends Shape
+```
+
+```scala
+/**
+ * A representation of a rectangle
+ */
+final case class Rectangle (
+  name: String,
+  shapeType: String,
+  /* The length of the rectangle */
+  length: Int,
+  /* The width of the rectangle */
+  width: Int) extends Shape
+```
