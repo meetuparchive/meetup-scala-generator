@@ -6,5 +6,5 @@ package {{package}}
 {{#model}}{{#description}}/**
  * {{{description}}}
  */{{/description}}
-{{#isEnum}}{{>modelEnum}}{{/isEnum}}{{^isEnum}}{{>modelClass}}{{/isEnum}}
+{{#isEnum}}{{>modelEnum}}{{/isEnum}}{{^isEnum}}{{#discriminator}}{{>modelParent}}{{/discriminator}}{{^discriminator}}{{>modelClass}}{{/discriminator}}{{/isEnum}}
 {{/model}}{{/models}}
