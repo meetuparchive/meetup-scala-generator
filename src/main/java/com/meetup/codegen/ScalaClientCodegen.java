@@ -153,6 +153,7 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
 
         instantiationTypes.put("date-time", "ZonedDateTime");
         instantiationTypes.put("array", "List");
+        instantiationTypes.put("integer", "Int");
 
         importMapping.put("ZonedDateTime", "java.time.ZonedDateTime");
 
@@ -160,6 +161,8 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
         typeMapping.put("array", "List");
         typeMapping.put("DateTime", "ZonedDateTime");
         typeMapping.put("long", "Long");
+        typeMapping.put("int", "Int");
+        typeMapping.put("Integer", "Int");
 
         importMapping.put("Date", "LocalDate");
     }
