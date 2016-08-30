@@ -11,10 +11,10 @@ import java.util.*;
 
 public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig {
 
-    private static final Set<String> NUMBER_TYPES = new HashSet<String>();
+    private static final Set<String> NUMBER_TYPES = new HashSet<>();
 
     public static Set<String> getNumberTypes() {
-        Set<String> copy = new HashSet<String>();
+        Set<String> copy = new HashSet<>();
         copy.addAll(NUMBER_TYPES);
         return copy;
     }
@@ -78,7 +78,7 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
             cliOptions.add(CliOption.newString(d.argument, d.description));
         }
 
-        /**
+        /*
          * Models.  You can write model files using the modelTemplateFiles map.
          * if you want to create one template for file, you can do so here.
          * for multiple files for model, just put another entry in the `modelTemplateFiles` with
@@ -88,7 +88,7 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
                 "model.mustache", // the template to use
                 ".scala");       // the extension for each file to write
 
-        /**
+        /*
          * Api classes.  You can write classes for each Api file with the apiTemplateFiles map.
          * as with models, add multiple entries with different extensions for multiple files per
          * class
@@ -97,49 +97,49 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
                 "api.mustache",   // the template to use
                 ".scala");       // the extension for each file to write
 
-        /**
+        /*
          * Template Location.  This is the location which templates will be read from.  The generator
          * will use the resource stream to attempt to read the templates.
          */
         templateDir = "meetupscalaclient";
 
-        /**
+        /*
          * Api Package.  Optional, if needed, this can be used in templates
          */
         apiPackage = "io.swagger.client.api";
 
-        /**
+        /*
          * Model Package.  Optional, if needed, this can be used in templates
          */
         modelPackage = "io.swagger.client.model";
 
-        /**
+        /*
          * Reserved words.  Override this with reserved words specific to your language
          */
-        reservedWords = new HashSet<String>(
+        reservedWords = new HashSet<>(
                 Arrays.asList(
                         "sample1",  // replace with static values
                         "sample2")
         );
 
-        /**
+        /*
          * Additional Properties.  These values can be passed to the templates and
          * are available in models, apis, and supporting files
          */
         additionalProperties.put("foo", "bar");
 
-        /**
+        /*
          * Supporting Files.  You can write single files for the generator with the
          * entire object tree available.  If the input file has a suffix of `.mustache
          * it will be processed by the template engine.  Otherwise, it will be copied
          */
         supportingFiles.add(new SupportingFile("build.sbt.mustache", "build.sbt"));
 
-        /**
+        /*
          * Language Specific Primitives.  These types will not trigger imports by
          * the client generator
          */
-        languageSpecificPrimitives = new HashSet<String>(
+        languageSpecificPrimitives = new HashSet<>(
                 Arrays.asList(
                         "Boolean",
                         "Double",
@@ -157,7 +157,7 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
 
         importMapping.put("ZonedDateTime", "java.time.ZonedDateTime");
 
-        typeMapping = new HashMap<String, String>();
+        typeMapping = new HashMap<>();
         typeMapping.put("array", "List");
         typeMapping.put("DateTime", "ZonedDateTime");
         typeMapping.put("long", "Long");
@@ -251,6 +251,7 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
     @Override
     public Map<String, Object> postProcessModels(Map<String, Object> objs) {
         // import sanitization lifted from ScalaClientCodegen
+        @SuppressWarnings("unchecked")
         List<Map<String, String>> imports = (List<Map<String, String>>) objs.get("imports");
         final String prefix = modelPackage() + ".";
         Iterator<Map<String, String>> iterator = imports.iterator();
