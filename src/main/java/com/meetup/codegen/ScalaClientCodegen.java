@@ -269,11 +269,6 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
         return camelize(property.name.split("_"));
     }
 
-//    @Override
-//    public String toEnumDefaultValue(String value, String datatype) {
-//        return datatype + "." + value;
-//    }
-
     public static String camelize(String[] parts) {
         StringBuilder sb = new StringBuilder();
         for(String s : parts) {
