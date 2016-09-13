@@ -6,5 +6,10 @@ import Parser._
 object Serializer {
   def serialize[A : Codec](a: A) = deparse(encode(a))
 
-  def deserialize[A : Codec](s: String): A = decode(parse(s))
+  def deserialize[A : Codec](s: String): Either[String, A] =
+    try {
+      decode(parse(s))
+    } catch {
+      case scala.util.control.NonFatal(e) => Left(e.getMessage)
+    }
 }

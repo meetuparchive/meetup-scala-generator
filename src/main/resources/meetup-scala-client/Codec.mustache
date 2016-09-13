@@ -2,13 +2,26 @@ package {{invokerPackage}}
 
 import {{jsonTypePackage}}.{{jsonType}}
 
+/**
+  * A `Codec[A]` instance provides bidirectional JSON serialization support.
+  * Instances of `A` can be encoded to and decoded from a JSON structure
+  * represented by the `{{jsonType}}` type.
+  */
 trait Codec[A] {
+  /**
+    * Encode an instance of `A` as an instance of `{{jsonType}}`.
+    */
   def encode(a: A): {{jsonType}}
-  def decode(j: {{jsonType}}): A
+
+  /**
+   * Decode an instance of `{{jsonType}}` as an instance of `A`.
+   */
+  def decode(j: {{jsonType}}): Either[String, A]
 }
 
 object Codec {
   def encode[A](a: A)(implicit c: Codec[A]): {{jsonType}} = c.encode(a)
 
-  def decode[A](j: {{jsonType}})(implicit c: Codec[A]): A = c.decode(j)
+  def decode[A](j: {{jsonType}})(implicit c: Codec[A]): Either[String, A] =
+    c.decode(j)
 }
