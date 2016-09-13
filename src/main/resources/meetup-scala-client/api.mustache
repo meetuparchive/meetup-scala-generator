@@ -1,0 +1,11 @@
+package {{package}}
+{{#operations}}
+{{#imports}}import {{import}}
+{{/imports}}
+
+object {{classname}} {
+{{#operation}}
+  def {{operationId}}({{#allParams}}{{paramName}}: {{dataType}}{{#hasNext}}, {{/hasNext}}{{/allParams}}): {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = ???
+{{/operation}}
+}
+{{/operations}}

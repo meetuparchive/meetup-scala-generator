@@ -1,0 +1,8 @@
+lazy val root = (project in file(".")).
+    settings(
+        version       := "{{clientVersion}}",
+        name          := "{{clientName}}",
+        organization  := "{{clientOrganization}}",
+        scalaVersion  := "2.11.8")
+
+initialCommands := "import {{apiPackage}}._; import {{modelPackage}}._"
