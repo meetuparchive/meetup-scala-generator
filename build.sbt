@@ -2,7 +2,7 @@ name := "meetup-scala-client"
 
 organization := "com.meetup"
 
-version := "0.0.1"
+version := "0.0.1-SNAPSHOT"
 
 crossPaths := false
 
