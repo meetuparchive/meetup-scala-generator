@@ -18,6 +18,21 @@ which is included in the same directory for convenience.
 
 Now you can poke around the generated source in the `generated` directory.
 
+## REPL Play: Models and JSON
+
+`(cd generated && ../sbt console)`
+
+```scala
+val plan = Plan("3 group unlimited plan", Entitlements(maxGroups = Some(3), maxUsers = None))
+val planJValue = Codec.encode(plan)
+val planJson = Parser.deparse(planJValue)
+```
+
+```scala
+val parsedJValue = Parser.parse(planJson)
+val parsedPlan = parsedJValue.right.flatMap(Codec.decode[Plan])
+```
+
 ## Interpretation of the OpenAPI Specification
 
 This generator is intended to target API specification files adhering to the [OpenAPI version 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).

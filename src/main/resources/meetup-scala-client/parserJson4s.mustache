@@ -5,6 +5,12 @@ import org.json4s.native.JsonMethods
 import org.json4s.native.JsonMethods.{compact, render}
 
 object Parser {
-  def parse(s: String): JValue = org.json4s.native.JsonMethods.parse(s)
+  def parse(s: String): Either[String, JValue] =
+    try {
+      Right(org.json4s.native.JsonMethods.parse(s))
+    } catch {
+      case scala.util.control.NonFatal(e) => Left(e.getMessage)
+    }
+
   def deparse[A](j: JValue): String = compact(render(j))
 }
