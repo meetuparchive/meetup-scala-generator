@@ -6,3 +6,7 @@ lazy val root = (project in file(".")).
         scalaVersion  := "2.11.8")
 
 initialCommands := "import {{apiPackage}}._; import {{modelPackage}}._"
+
+// TODO this depends on JSON lib selection, but if we support other libs this
+// can be modified.
+libraryDependencies += "org.json4s" %% "json4s-native" % "3.4.0"
