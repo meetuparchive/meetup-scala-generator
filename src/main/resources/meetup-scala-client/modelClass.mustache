@@ -1,8 +1,12 @@
 final case class {{classname}} (
 {{#vars}}{{#description}}/* {{{description}}} */
 {{/description}}  {{name}}: {{#required}}{{#isEnum}}{{classname}}.{{datatypeWithEnum}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}{{/required}}{{^required}}Option[{{#isEnum}}{{classname}}.{{datatypeWithEnum}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}]{{/required}}{{#hasMore}},{{/hasMore}}{{^hasMore}}){{#parent}} extends {{parent}}{{/parent}}{{/hasMore}}
-{{/vars}}{{#hasEnums}}
+{{/vars}}
+
 object {{classname}} {
-  {{#vars}}{{#isEnum}}{{>modelEnum}}{{/isEnum}}{{/vars}}
+  {{#hasEnums}}{{#vars}}{{#isEnum}}{{>modelEnum}}{{/isEnum}}{{/vars}}{{/hasEnums}}
+
+  import {{invokerPackage}}.Codec
+
+  {{#json4s}}implicit val {{classname}}Codec = {{>codecJson4s}}{{/json4s}}
 }
-{{/hasEnums}}

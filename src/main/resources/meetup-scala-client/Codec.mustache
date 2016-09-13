@@ -1,0 +1,14 @@
+package {{invokerPackage}}
+
+import {{jsonTypePackage}}.{{jsonType}}
+
+trait Codec[A] {
+  def encode(a: A): {{jsonType}}
+  def decode(j: {{jsonType}}): A
+}
+
+object Codec {
+  def encode[A](a: A)(implicit c: Codec[A]): {{jsonType}} = c.encode(a)
+
+  def decode[A](j: {{jsonType}})(implicit c: Codec[A]): A = c.decode(j)
+}

@@ -1,0 +1,10 @@
+package {{invokerPackage}}
+
+import Codec._
+import Parser._
+
+object Serializer {
+  def serialize[A : Codec](a: A) = deparse(encode(a))
+
+  def deserialize[A : Codec](s: String): A = decode(parse(s))
+}

@@ -1,0 +1,11 @@
+new Codec[{{classname}}] {
+
+  import org.json4s._
+  import org.json4s.native.Serialization
+
+  implicit val formats = Serialization.formats(NoTypeHints)
+
+  def encode(a: {{classname}}): JValue = Extraction.decompose(a)
+
+  def decode(j: JValue): {{classname}} = j.extract[{{classname}}]
+}

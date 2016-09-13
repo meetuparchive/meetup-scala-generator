@@ -19,4 +19,24 @@ object {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{cla
    * if there is one.
    */
   def fromValue(value: {{#dataType}}{{.}}{{/dataType}}{{^dataType}}{{datatype}}{{/dataType}}): Option[{{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}] = valueMap.get(value)
+
+  import {{invokerPackage}}.Codec
+  import org.json4s._
+
+  implicit val PspCodec = new Codec[{{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}] {
+    def encode(a: Psp): {{jsonType}} =
+      a match {
+        {{#allowableValues}}{{#enumVars}}case {{name}} => JString({{{value}}})
+        {{/enumVars}}{{/allowableValues}}
+      }
+    def decode(j: {{jsonType}}): {{name}} = ???
+  }
+
+  /*
+  {{#allowableValues}}{{#enumVars}}
+  implicit val {{name}}Codec = new Codec[{{name}}.type] {
+    def encode(a: {{name}}.type): {{jsonType}} = JString({{{value}}})
+    def decode(j: {{jsonType}}): {{name}}.type = ???
+  }{{/enumVars}}{{/allowableValues}}
+  */
 }

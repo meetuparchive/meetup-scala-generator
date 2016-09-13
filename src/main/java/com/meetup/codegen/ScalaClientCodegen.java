@@ -11,6 +11,12 @@ import java.util.*;
 
 public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig {
 
+    private String invokerPackage = "io.swagger";
+
+    // source folder where to write the files
+    private final String sourceFolder = "src/main/scala";
+    private String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
+
     private static final Set<String> NUMBER_TYPES = new HashSet<>();
 
     public static Set<String> getNumberTypes() {
@@ -52,9 +58,6 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
             this.argument = sb.toString();
         }
     }
-
-    // source folder where to write the files
-    private final String sourceFolder = "src/main/scala";
 
     public CodegenType getTag() {
         return CodegenType.CLIENT;
@@ -119,11 +122,19 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
         reservedWords = new HashSet<>(); // TODO add scala (and template?) reserved words
 
         /*
+         * Additional Properties.  These values can be passed to the templates and
+         * are available in models, apis, and supporting files
+         */
+        additionalProperties.put(CodegenConstants.INVOKER_PACKAGE, invokerPackage);
+
+        /*
          * Supporting Files.  You can write single files for the generator with the
          * entire object tree available.  If the input file has a suffix of `.mustache
          * it will be processed by the template engine.  Otherwise, it will be copied
          */
         supportingFiles.add(new SupportingFile("build.sbt.mustache", "build.sbt"));
+        supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
+        supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
 
         /*
          * Language Specific Primitives.  These types will not trigger imports by
@@ -165,6 +176,12 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
             String value = _value == null ? arg.value : _value.toString();
             additionalProperties.put(arg.argument, value);
         }
+
+        // TODO this should be a generator option
+        additionalProperties.put("json4s", "true");
+        additionalProperties.put("jsonTypePackage", "org.json4s");
+        additionalProperties.put("jsonType", "JValue");
+        supportingFiles.add(new SupportingFile("parserJson4s.mustache", invokerFolder, "Parser.scala"));
     }
 
     /**
