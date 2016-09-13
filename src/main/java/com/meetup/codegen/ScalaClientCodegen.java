@@ -116,17 +116,7 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
         /*
          * Reserved words.  Override this with reserved words specific to your language
          */
-        reservedWords = new HashSet<>(
-                Arrays.asList(
-                        "sample1",  // replace with static values
-                        "sample2")
-        );
-
-        /*
-         * Additional Properties.  These values can be passed to the templates and
-         * are available in models, apis, and supporting files
-         */
-        additionalProperties.put("foo", "bar");
+        reservedWords = new HashSet<>(); // TODO add scala (and template?) reserved words
 
         /*
          * Supporting Files.  You can write single files for the generator with the
