@@ -5,7 +5,7 @@ lazy val root = (project in file(".")).
         organization  := "{{clientOrganization}}",
         scalaVersion  := "2.11.8")
 
-initialCommands := "import {{apiPackage}}._; import {{modelPackage}}._"
+initialCommands := "import {{invokerPackage}}._; import {{apiPackage}}._; import {{modelPackage}}._"
 
 // TODO this depends on JSON lib selection, but if we support other libs this
 // can be modified.
