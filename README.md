@@ -18,6 +18,68 @@ which is included in the same directory for convenience.
 
 Now you can poke around the generated source in the `generated` directory.
 
+## Models and JSON
+
+In addition to generating models, the generator also generates bidirectional JSON codecs for each.
+Having run the commands above you should have a `generated` directory that contains the generated source,
+which is itself an SBT project. Let's start a REPL to check things out:
+
+`(cd generated && ../sbt console)`
+
+Now construct a plan and serialize it to a JSON string:
+
+```scala
+val plan: Plan = Plan("3 group unlimited plan", Entitlements(maxGroups = Some(3), maxUsers = None))
+val planJson: String = Serializer.serialize(plan)
+```
+
+This constructs a plan that would permit the organizer to create at most 3 MUGs with no limit on the membership count of each.
+Pretty-printed, we have:
+
+```scala
+{
+  "entitlements": {
+    "maxGroups": 3
+  },
+  "name": "3 group unlimited plan"
+}
+```
+
+Now that we have this JSON blob in the `planJson` variable, let's go backwards and use it to deserialize a `Plan` instance:
+
+```scala
+val planResult: Either[String, Plan] = Serializer.deserialize[Plan](planJson)
+```
+
+There are two things to note here. First, the result type is `Either[String, Plan]` rather than simply `Plan`. This is because
+deserialization can fail, either because the input string is not valid JSON, or it is, but its structure isn't comprehensible
+as a serialized plan. Second, we had to explicitly pass the `Plan` type parameter to the `deserialize` call. At a high-level
+this is because the implementation relies on static, compile-time proof that a `Plan` can be deserialized. 
+
+`Serializer` is a convenience module that relies on two other components: the `Parser` module functions and the `Codec` instances
+for each model. Let's use those directly to get a sense of what the `Serializer` does:
+
+```scala
+val planJValue: JValue = Codec.encode(plan)
+val planJson: String = Parser.deparse(planJValue)
+```
+
+Here we pass the `plan` value, the same `Plan` instance we created above, to `Codec.encode`. `Codec` is both a module and a
+typeclass, instances of which are parameterized on a given type and provide bidirectional serialization between that type
+and a structured JSON AST, not a raw string. `Codec.encode` simply resolves the `Codec` instance for the type of the given
+value and encodes it in this AST. Next we pass that resulting value to `Parser.deparse`, which can safely convert the
+structured AST value into a valid JSON string. Now let's convert it back to a `Plan` instance:
+
+```scala
+val parsedJValue: Either[String, JValue] = Parser.parse(planJson)
+val parsedPlan: Either[String, Plan] = parsedJValue.right.flatMap(Codec.decode[Plan])
+```
+
+First we use `Parser.parse` to attempt to parse a raw string into a structure JSON representation
+(currently a `JValue` instance). This returns an `Either[String, JValue]` because it may fail to parse. Next we
+`flatMap` over that value using `Codec.decode` to decode the `JValue` as a `Plan`. As this too can fail, it results in
+an `Either[String, JValue]`, so we use `flatMap` to end up with a "flattened" structure.
+
 ## Interpretation of the OpenAPI Specification
 
 This generator is intended to target API specification files adhering to the [OpenAPI version 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).
