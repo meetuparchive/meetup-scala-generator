@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.util.*;
 
-public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig {
+public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig {
 
     private String invokerPackage = "io.swagger";
 
@@ -60,22 +60,22 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
     }
 
     public CodegenType getTag() {
-        return CodegenType.CLIENT;
+        return CodegenType.SERVER;
     }
 
     public String getName() {
-        return "meetup-scala-client";
+        return "meetup-scala-server";
     }
 
     public String getHelp() {
         return "Generates " + getName() + " library.";
     }
 
-    public ScalaClientCodegen() {
+    public ScalaServerCodegen() {
         super();
 
         // set the output folder here
-        outputFolder = "generated-code/meetup-scala-client";
+        outputFolder = "generated-code/meetup-scala-server";
 
         for (Arg d : Arg.values()) {
             cliOptions.add(CliOption.newString(d.argument, d.description));
@@ -96,9 +96,9 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
          * as with models, add multiple entries with different extensions for multiple files per
          * class
          */
-        apiTemplateFiles.put(
-                "api.mustache",   // the template to use
-                ".scala");       // the extension for each file to write
+//        apiTemplateFiles.put(
+//                "api.mustache",   // the template to use
+//                ".scala");       // the extension for each file to write
 
         /*
          * Template Location.  This is the location which templates will be read from.  The generator
@@ -132,7 +132,10 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
          * entire object tree available.  If the input file has a suffix of `.mustache
          * it will be processed by the template engine.  Otherwise, it will be copied
          */
-        supportingFiles.add(new SupportingFile("build.sbt.mustache", "build.sbt"));
+        supportingFiles.add(new SupportingFile("server/Main.mustache", invokerFolder, "Main.scala"));
+        supportingFiles.add(new SupportingFile("server/build.sbt.mustache", "build.sbt"));
+
+        // common
         supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
         supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
 

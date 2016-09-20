@@ -1,4 +1,4 @@
-name := "meetup-scala-client"
+name := "meetup-scala"
 
 organization := "com.meetup"
 
