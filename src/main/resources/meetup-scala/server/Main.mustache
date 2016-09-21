@@ -1,5 +1,24 @@
-object Foo {
-  def main(args: Array[String]) {
-    println("main")
-  }
+package {{invokerPackage}}
+
+import io.netty.buffer.ByteBuf
+import io.netty.handler.codec.http.HttpResponseStatus
+import io.reactivex.netty.protocol.http.server.{HttpServerRequest, HttpServerResponse, RequestHandler}
+
+object Main extends Runner {
+
+  def initializeApplication(environment: Map[String, String], args: Array[String]): Application =
+    new Application { // TODO this will be replaced with https://meetup.atlassian.net/browse/SGT-17
+      override val handler =
+        new RequestHandler[ByteBuf, ByteBuf] {
+          override def handle(request: HttpServerRequest[ByteBuf], response: HttpServerResponse[ByteBuf]) = {
+            response.setStatus(HttpResponseStatus.OK)
+            response.writeString("Hello")
+            response.close(true)
+          }
+        }
+
+      override def shutdown() {
+        println("bye!")
+      }
+    }
 }

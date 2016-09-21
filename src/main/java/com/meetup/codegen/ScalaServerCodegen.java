@@ -33,9 +33,9 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
      * Arguments supported by this generator.
      */
     private enum Arg {
-        CLIENT_NAME("client", "The artifact thing"),
-        CLIENT_ORGANIZATION("com.meetup.client", "The org .."),
-        CLIENT_VERSION("1.0.0", "The client version");
+        ARTIFACT_NAME("server", "The artifact name"),
+        ARTIFACT_ORGANIZATION("com.meetup", "The artifact organization"),
+        ARTIFACT_VERSION("1.0.0-SNAPSHOT", "The artifact version");
 
         public final String value;
         public final String description;
@@ -92,24 +92,10 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
                 ".scala");       // the extension for each file to write
 
         /*
-         * Api classes.  You can write classes for each Api file with the apiTemplateFiles map.
-         * as with models, add multiple entries with different extensions for multiple files per
-         * class
-         */
-//        apiTemplateFiles.put(
-//                "api.mustache",   // the template to use
-//                ".scala");       // the extension for each file to write
-
-        /*
          * Template Location.  This is the location which templates will be read from.  The generator
          * will use the resource stream to attempt to read the templates.
          */
         templateDir = "meetup-scala";
-
-        /*
-         * Api Package.  Optional, if needed, this can be used in templates
-         */
-        apiPackage = "io.swagger.client.api";
 
         /*
          * Model Package.  Optional, if needed, this can be used in templates
@@ -120,24 +106,6 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
          * Reserved words.  Override this with reserved words specific to your language
          */
         reservedWords = new HashSet<>(); // TODO add scala (and template?) reserved words
-
-        /*
-         * Additional Properties.  These values can be passed to the templates and
-         * are available in models, apis, and supporting files
-         */
-        additionalProperties.put(CodegenConstants.INVOKER_PACKAGE, invokerPackage);
-
-        /*
-         * Supporting Files.  You can write single files for the generator with the
-         * entire object tree available.  If the input file has a suffix of `.mustache
-         * it will be processed by the template engine.  Otherwise, it will be copied
-         */
-        supportingFiles.add(new SupportingFile("server/Main.mustache", invokerFolder, "Main.scala"));
-        supportingFiles.add(new SupportingFile("server/build.sbt.mustache", "build.sbt"));
-
-        // common
-        supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
-        supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
 
         /*
          * Language Specific Primitives.  These types will not trigger imports by
@@ -178,7 +146,35 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
             Object _value = additionalProperties.get(arg.argument);
             String value = _value == null ? arg.value : _value.toString();
             additionalProperties.put(arg.argument, value);
+            System.out.println(String.format("Exposed %s as %s", arg.argument, arg.value));
         }
+
+        // Set the invoker package and folder to the artifact organization + client.
+        invokerPackage =
+                additionalProperties.get(Arg.ARTIFACT_ORGANIZATION.argument).toString() +
+                        "." + additionalProperties.get(Arg.ARTIFACT_NAME.argument).toString();
+        invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
+
+        modelPackage = invokerPackage + ".api.model";
+
+        additionalProperties.put(CodegenConstants.INVOKER_PACKAGE, invokerPackage);
+
+        // Now add supporting files as their location depends on the above logic.
+        supportingFiles.add(new SupportingFile("server/build.sbt.mustache", "build.sbt"));
+        supportingFiles.add(new SupportingFile("server/build.properties.mustache", "project/build.properties"));
+        supportingFiles.add(new SupportingFile("server/plugins.sbt.mustache", "project/plugins.sbt"));
+        supportingFiles.add(new SupportingFile("server/Makefile.mustache", "Makefile"));
+        supportingFiles.add(new SupportingFile("server/Application.mustache", invokerFolder, "Application.scala"));
+        supportingFiles.add(new SupportingFile("server/Main.mustache", invokerFolder, "Main.scala"));
+        supportingFiles.add(new SupportingFile("server/Runner.mustache", invokerFolder, "Runner.scala"));
+        supportingFiles.add(new SupportingFile("server/RainbowsHandler.mustache", invokerFolder, "RainbowsHandler.scala"));
+        supportingFiles.add(new SupportingFile("server/RequestLoggingHandler.mustache", invokerFolder, "RequestLoggingHandler.scala"));
+        supportingFiles.add(new SupportingFile("server/Server.mustache", invokerFolder, "Server.scala"));
+
+        // common
+        supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
+        supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
+
 
         // TODO this should be a generator option
         additionalProperties.put("json4s", "true");
@@ -204,15 +200,6 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
      */
     public String modelFileFolder() {
         return outputFolder + "/" + sourceFolder + "/" + modelPackage().replace('.', File.separatorChar);
-    }
-
-    /**
-     * Location to write api files.  You can use the apiPackage() as defined when the class is
-     * instantiated
-     */
-    @Override
-    public String apiFileFolder() {
-        return outputFolder + "/" + sourceFolder + "/" + apiPackage().replace('.', File.separatorChar);
     }
 
     /**

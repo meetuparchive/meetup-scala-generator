@@ -1,0 +1,30 @@
+package {{invokerPackage}}
+
+import com.meetup.logging.Logging
+import io.netty.buffer.ByteBuf
+import io.reactivex.netty.protocol.http.server.{HttpServerRequest, HttpServerResponse, RequestHandler}
+
+import scala.collection.JavaConverters._
+
+class RequestLoggingHandler(handler: RequestHandler[ByteBuf, ByteBuf]) extends RequestHandler[ByteBuf, ByteBuf] with Logging {
+
+  override def handle(
+    request: HttpServerRequest[ByteBuf],
+    response: HttpServerResponse[ByteBuf]) = {
+
+    log.info(formatRequest(request))
+
+    handler.handle(request, response)
+  }
+
+  private def formatRequest(request: HttpServerRequest[ByteBuf]): String = {
+    val headers = request.getHeaders.entries().asScala
+      .map(e => e.getKey + ": " + e.getValue)
+      .mkString(System.lineSeparator)
+
+    s"""
+       |${request.getHttpVersion} ${request.getHttpMethod} ${request.getUri}
+       |$headers
+     """.stripMargin
+  }
+}

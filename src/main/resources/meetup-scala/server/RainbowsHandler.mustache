@@ -1,0 +1,30 @@
+package {{invokerPackage}}
+
+import io.netty.buffer.ByteBuf
+import io.netty.handler.codec.http.{HttpHeaderNames, HttpResponseStatus}
+import io.reactivex.netty.protocol.http.server.{HttpServerRequest, HttpServerResponse, RequestHandler}
+
+/**
+ * Wraps a handler to intercept /_rainbows requests.
+ */
+class RainbowsHandler(handler: RequestHandler[ByteBuf, ByteBuf]) extends RequestHandler[ByteBuf, ByteBuf] {
+
+  override def handle(request: HttpServerRequest[ByteBuf], response: HttpServerResponse[ByteBuf]) =
+    if (request.getPath.startsWith("/_rainbows")) {
+      response.setStatus(HttpResponseStatus.OK)
+
+      val message =
+        s"""{"μ": "🌈 🦄 ☁️", "name": "${BuildInfo.name}", "organization": "${BuildInfo.organization}", "version": "${BuildInfo.version}", "sbtVersion": "${BuildInfo.sbtVersion}", "scalaVersion": "${BuildInfo.scalaVersion}"}"""
+
+      val messageBytes = message.getBytes("UTF-8")
+      val content: ByteBuf =
+        response.getAllocator
+          .buffer(messageBytes.length)
+          .writeBytes(messageBytes)
+
+      val headers = response.getHeaders
+      headers.set(HttpHeaderNames.CONTENT_LENGTH, messageBytes.length)
+      headers.set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8")
+      response.writeAndFlush(content)
+    } else handler.handle(request, response)
+}
