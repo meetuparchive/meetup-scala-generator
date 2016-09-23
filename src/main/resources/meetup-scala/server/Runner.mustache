@@ -1,0 +1,40 @@
+package {{invokerPackage}}
+
+/**
+ * A trait to provide a consistent service bootstrapping process.
+ */
+trait Runner {
+
+  /**
+   * Initialize the application given the environment and any command line
+   * arguments. This is where internal, service-specific bootstrapping
+   * (databases, etc) should occur.
+   *
+   * @param environment environment variables
+   * @param args        command line arguments
+   */
+  def initializeApplication(environment: Map[String, String], args: Array[String]): Application
+
+  final def main(args: Array[String]) {
+    /* Initialize the application and server, and get shutdown function. */
+
+    val app = initializeApplication(sys.env, args)
+    val (server, doShutdown) = Server(9000, app)
+
+    if (Thread.currentThread().getName.startsWith("run-main-")) {
+      /* We're running under SBT so stay attached to the terminal and shutdown
+         on key-press. */
+      System.out.println(s"Server running on port ${server.getServerPort}. Press enter to terminate.")
+      System.in.read()
+      doShutdown()
+    } else {
+      /* Not running under SBT, or we are but under a forked JVM. In either
+         case we ensure shutdown but registering our shutdown procedure as a
+         shutdown hook. */
+      sys.addShutdownHook { doShutdown() }
+    }
+
+    /* Block the main thread to prevent exit until the server has shutdown. */
+    server.waitTillShutdown()
+  }
+}

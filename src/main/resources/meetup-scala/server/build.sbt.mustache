@@ -1,0 +1,35 @@
+enablePlugins(
+  BuildInfoPlugin,
+  CoverallsWrapper,
+  DockerPackagePlugin
+)
+
+name := "{{artifactName}}"
+
+organization := "{{artifactOrganization}}"
+
+version := "{{artifactVersion}}"
+
+scalaVersion := "2.11.8"
+
+// TODO this depends on JSON lib selection, but if we support other libs this
+// can be modified.
+libraryDependencies ++=
+  Seq(
+    "org.json4s" %% "json4s-native" % "3.4.0",
+    "com.netflix.hystrix" % "hystrix-rx-netty-metrics-stream" % "1.4.23"
+      exclude("io.reactivex", "rxnetty")
+      exclude("com.netflix.archaius", "archaius-core"), // TODO make sure this is safe
+    "io.reactivex" % "rxnetty" % "0.4.16",
+    "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0",
+    "com.meetup" %% "scala-logger" % "10.0.0",
+    "io.reactivex" % "rxnetty" % "0.4.16"
+  )
+
+buildInfoKeys := Seq[BuildInfoKey](name, organization, version, scalaVersion, sbtVersion)
+
+buildInfoPackage := "{{invokerPackage}}"
+
+initialCommands := "import {{invokerPackage}}._; import {{modelPackage}}._"
+
+watchSources <<= (watchSources, baseDirectory) { (w, b) => w.map(_ :+ new java.io.File(b.getParent, "swagger.yaml")) }

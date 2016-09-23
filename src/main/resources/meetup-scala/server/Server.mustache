@@ -1,0 +1,55 @@
+package {{invokerPackage}}
+
+import com.meetup.logging.Logging
+import com.netflix.hystrix.contrib.rxnetty.metricsstream.HystrixMetricsStreamHandler
+import io.netty.buffer.ByteBuf
+import io.netty.handler.codec.http.HttpResponseStatus
+import io.reactivex.netty.RxNetty
+import io.reactivex.netty.protocol.http.server.{ErrorResponseGenerator, HttpServer, HttpServerResponse, RequestHandler}
+
+object Server extends Logging {
+  def apply(portNumber: Int, application: Application): (HttpServer[ByteBuf, ByteBuf], () => Unit) = {
+    log.info("Server is starting up")
+    /* Initialize the application and server. */
+    val server = mkServer(portNumber, application.handler)
+
+    /* Construct a sane shutdown procedure for the server and application. */
+    val doShutdown: () => Unit = () => {
+      log.info("Server is shutting down")
+      server.shutdown()
+      /* We call this here to make sure the server has terminated (no new
+         connections and all active have terminated) before shutting down the
+         application services. */
+      server.waitTillShutdown()
+      application.shutdown()
+      log.info("Shutdown complete")
+    }
+
+    server.start
+
+    log.info("Server started")
+    (server, doShutdown)
+  }
+
+  def mkServer(port: Int, handler: RequestHandler[ByteBuf, ByteBuf]) = {
+
+    /* Wrap the handler in a HystrixMetricsStreamHandler to give us Hystrix
+       metrics reporting. */
+    val metricsHandler = new HystrixMetricsStreamHandler(handler)
+    val rainbowsHandler = new RainbowsHandler(metricsHandler)
+    val loggingHandler = new RequestLoggingHandler(rainbowsHandler)
+
+    val server: HttpServer[ByteBuf, ByteBuf] =
+      RxNetty.createHttpServer(port, loggingHandler)
+        .withErrorResponseGenerator(
+          new ErrorResponseGenerator[ByteBuf] {
+            override def updateResponse(response: HttpServerResponse[ByteBuf], error: Throwable): Unit = {
+              log.error("Unhandled exception", error)
+              response.setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR)
+            }
+          }
+        )
+
+    server
+  }
+}
