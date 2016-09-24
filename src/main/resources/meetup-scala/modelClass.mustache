@@ -3,6 +3,7 @@ final case class {{classname}} (
 {{/description}}  {{name}}: {{#required}}{{#isEnum}}{{classname}}.{{datatypeWithEnum}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}{{/required}}{{^required}}Option[{{#isEnum}}{{classname}}.{{datatypeWithEnum}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}]{{/required}}{{#hasMore}},{{/hasMore}}{{^hasMore}}){{#parent}} extends {{parent}}{{/parent}}{{/hasMore}}
 {{/vars}}
 
+{{^modelsOnly}}
 object {{classname}} {
   {{#hasEnums}}{{#vars}}{{#isEnum}}{{>modelEnum}}{{/isEnum}}{{/vars}}{{/hasEnums}}
 
@@ -10,3 +11,4 @@ object {{classname}} {
 
   {{#json4s}}implicit val {{classname}}Codec = {{>codecJson4s}}{{/json4s}}
 }
+{{/modelsOnly}}

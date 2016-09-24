@@ -35,7 +35,8 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
     private enum Arg {
         ARTIFACT_NAME("server", "The artifact name"),
         ARTIFACT_ORGANIZATION("com.meetup", "The artifact organization"),
-        ARTIFACT_VERSION("1.0.0-SNAPSHOT", "The artifact version");
+        ARTIFACT_VERSION("1.0.0-SNAPSHOT", "The artifact version"),
+        MODELS_ONLY("false", "Generate only the model class files");
 
         public final String value;
         public final String description;
@@ -159,28 +160,39 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
 
         additionalProperties.put(CodegenConstants.INVOKER_PACKAGE, invokerPackage);
 
+        final boolean modelsOnly = Boolean.parseBoolean((String)additionalProperties.get(Arg.MODELS_ONLY.argument));
+        additionalProperties.put(Arg.MODELS_ONLY.argument, modelsOnly);
+
         // Now add supporting files as their location depends on the above logic.
-        supportingFiles.add(new SupportingFile("server/build.sbt.mustache", "build.sbt"));
-        supportingFiles.add(new SupportingFile("server/build.properties.mustache", "project/build.properties"));
-        supportingFiles.add(new SupportingFile("server/plugins.sbt.mustache", "project/plugins.sbt"));
-        supportingFiles.add(new SupportingFile("server/Makefile.mustache", "Makefile"));
-        supportingFiles.add(new SupportingFile("server/Application.mustache", invokerFolder, "Application.scala"));
-        supportingFiles.add(new SupportingFile("server/Main.mustache", invokerFolder, "Main.scala"));
-        supportingFiles.add(new SupportingFile("server/Runner.mustache", invokerFolder, "Runner.scala"));
-        supportingFiles.add(new SupportingFile("server/RainbowsHandler.mustache", invokerFolder, "RainbowsHandler.scala"));
-        supportingFiles.add(new SupportingFile("server/RequestLoggingHandler.mustache", invokerFolder, "RequestLoggingHandler.scala"));
-        supportingFiles.add(new SupportingFile("server/Server.mustache", invokerFolder, "Server.scala"));
+        if (!modelsOnly) {
+            supportingFiles.add(new SupportingFile("server/build.sbt.mustache", "build.sbt"));
+            supportingFiles.add(new SupportingFile("server/build.properties.mustache", "project/build.properties"));
+            supportingFiles.add(new SupportingFile("server/plugins.sbt.mustache", "project/plugins.sbt"));
+            supportingFiles.add(new SupportingFile("server/Makefile.mustache", "Makefile"));
+            supportingFiles.add(new SupportingFile("server/Application.mustache", invokerFolder, "Application.scala"));
+            supportingFiles.add(new SupportingFile("server/Main.mustache", invokerFolder, "Main.scala"));
+            supportingFiles.add(new SupportingFile("server/Runner.mustache", invokerFolder, "Runner.scala"));
+            supportingFiles.add(new SupportingFile("server/RainbowsHandler.mustache", invokerFolder, "RainbowsHandler.scala"));
+            supportingFiles.add(new SupportingFile("server/RequestLoggingHandler.mustache", invokerFolder, "RequestLoggingHandler.scala"));
+            supportingFiles.add(new SupportingFile("server/Server.mustache", invokerFolder, "Server.scala"));
+        }
 
         // common
-        supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
-        supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
+        if (!modelsOnly) {
+            supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
+            supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
+        }
 
 
         // TODO this should be a generator option
-        additionalProperties.put("json4s", "true");
-        additionalProperties.put("jsonTypePackage", "org.json4s");
-        additionalProperties.put("jsonType", "JValue");
-        supportingFiles.add(new SupportingFile("parserJson4s.mustache", invokerFolder, "Parser.scala"));
+        if (!modelsOnly) {
+            additionalProperties.put("json4s", "true");
+            additionalProperties.put("jsonTypePackage", "org.json4s");
+            additionalProperties.put("jsonType", "JValue");
+            supportingFiles.add(new SupportingFile("parserJson4s.mustache", invokerFolder, "Parser.scala"));
+        }
+
+        System.out.println(additionalProperties.toString());
     }
 
     /**
