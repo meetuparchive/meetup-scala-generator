@@ -36,6 +36,8 @@ paths:
 
   /subscriptions/{id}:
     get:
+      tags:
+        - subscription
       description: Fetch an existing subscription.
       parameters:
         - name: id

@@ -11,7 +11,13 @@ included for convenience.
 This will have produced a jar of the generator, which we can now use for
 code generation:
 
+### Generate a client
 `CP=target/meetup-scala-client-0.0.1.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-client -o generated`
+
+### Generate a server
+`CP=target/meetup-scala-0.0.1-SNAPSHOT.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-server -o generated`
+
+---
 
 This uses the `swagger-codegen` script to run the [swagger-codegen CLI](https://github.com/swagger-api/swagger-codegen),
 which is included in the same directory for convenience.

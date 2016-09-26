@@ -91,11 +91,35 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
                 "model.mustache", // the template to use
                 ".scala");       // the extension for each file to write
 
+
+        /**
+         * Api classes.  You can write classes for each Api file with the apiTemplateFiles map.
+         * as with models, add multiple entries with different extensions for multiple files per
+         * class
+         */
+
+        apiTemplateFiles.put(
+                "server/routing.mustache",   // the template to use
+                "Routing.scala");       // the extension for each file to write
+
+        apiTemplateFiles.put(
+                 "api.mustache",   // the template to use
+                 ".scala");       // the extension for each file to write
+
+        apiTemplateFiles.put(
+                "server/Main.mustache",   // the template to use
+                "Main.scala");       // the extension for each file to write
+
         /*
          * Template Location.  This is the location which templates will be read from.  The generator
          * will use the resource stream to attempt to read the templates.
          */
         templateDir = "meetup-scala";
+
+        /**
+         * Api Package.  Optional, if needed, this can be used in templates
+         */
+        apiPackage = "com.meetup.foo.api";
 
         /*
          * Model Package.  Optional, if needed, this can be used in templates
@@ -156,7 +180,7 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
         invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
 
         modelPackage = invokerPackage + ".api.model";
-
+        apiPackage = invokerPackage + ".api.api";
         additionalProperties.put(CodegenConstants.INVOKER_PACKAGE, invokerPackage);
 
         // Now add supporting files as their location depends on the above logic.
@@ -165,7 +189,6 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
         supportingFiles.add(new SupportingFile("server/plugins.sbt.mustache", "project/plugins.sbt"));
         supportingFiles.add(new SupportingFile("server/Makefile.mustache", "Makefile"));
         supportingFiles.add(new SupportingFile("server/Application.mustache", invokerFolder, "Application.scala"));
-        supportingFiles.add(new SupportingFile("server/Main.mustache", invokerFolder, "Main.scala"));
         supportingFiles.add(new SupportingFile("server/Runner.mustache", invokerFolder, "Runner.scala"));
         supportingFiles.add(new SupportingFile("server/RainbowsHandler.mustache", invokerFolder, "RainbowsHandler.scala"));
         supportingFiles.add(new SupportingFile("server/RequestLoggingHandler.mustache", invokerFolder, "RequestLoggingHandler.scala"));
@@ -201,6 +224,16 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
     public String modelFileFolder() {
         return outputFolder + "/" + sourceFolder + "/" + modelPackage().replace('.', File.separatorChar);
     }
+
+    /**
+     * Location to write api files.  You can use the apiPackage() as defined when the class is
+     * instantiated
+     */
+    @Override
+    public String apiFileFolder() {
+        return outputFolder + "/" + sourceFolder + "/" + apiPackage().replace('.', File.separatorChar);
+    }
+
 
     /**
      * Optional - type declaration.  This is a String which is used by the templates to instantiate your
@@ -259,6 +292,36 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
 
         // Now subject the models to Enum treatment.
         return postProcessModelsEnum(objs);
+    }
+
+
+    @Override
+    public Map<String, Object> postProcessOperations(Map<String, Object> objs) {
+        Map<String, Object> operations = (Map<String, Object>) objs.get("operations");
+        List<CodegenOperation> operationList = (List<CodegenOperation>) operations.get("operation");
+        for (CodegenOperation op : operationList) {
+            String[] items = op.path.split("/", -1);
+            String scalaPath = "";
+
+            for (int i = 1; i < items.length; ++i) {
+                if (i > 1) {
+                    scalaPath = scalaPath + " :: ";
+                }
+                if (items[i] != "" && items[i] != null) {
+                    if (items[i].matches("^\\{(.*)\\}$")) { // wrap in {}
+                        String itemWithoutBrackets = items[i].replace("{", "").replace("}", "");
+
+                        scalaPath = scalaPath + itemWithoutBrackets;
+                    } else {
+                        scalaPath = scalaPath + "\"" + items[i] + "\"";
+                    }
+                }
+            }
+
+            op.vendorExtensions.put("x-meetup-scala-op-case", scalaPath);
+        }
+
+        return objs;
     }
 
     @Override

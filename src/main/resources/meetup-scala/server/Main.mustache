@@ -1,19 +1,18 @@
-package {{invokerPackage}}
+package {{package}}
 
 import io.netty.buffer.ByteBuf
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.reactivex.netty.protocol.http.server.{HttpServerRequest, HttpServerResponse, RequestHandler}
+import com.meetup.server._
 
-object Main extends Runner {
+object {{classname}}Main extends Runner {
 
   def initializeApplication(environment: Map[String, String], args: Array[String]): Application =
-    new Application { // TODO this will be replaced with https://meetup.atlassian.net/browse/SGT-17
+    new Application {
       override val handler =
         new RequestHandler[ByteBuf, ByteBuf] {
           override def handle(request: HttpServerRequest[ByteBuf], response: HttpServerResponse[ByteBuf]) = {
-            response.setStatus(HttpResponseStatus.OK)
-            response.writeString("Hello")
-            response.close(true)
+              {{classname}}Routing.handleRequest(request, response)
           }
         }
 
