@@ -12,7 +12,7 @@ object {{classname}}Main extends Runner {
       override val handler =
         new RequestHandler[ByteBuf, ByteBuf] {
           override def handle(request: HttpServerRequest[ByteBuf], response: HttpServerResponse[ByteBuf]) = {
-              {{classname}}Routing.handleRequest(request, response)
+              {{classname}}Router.handleRequest(request, response)
           }
         }
 

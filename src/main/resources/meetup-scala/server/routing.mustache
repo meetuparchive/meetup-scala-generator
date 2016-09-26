@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.reactivex.netty.protocol.http.server.{HttpServerRequest, HttpServerResponse, RequestHandler}
 
-object {{classname}}Routing {
+object {{classname}}Router {
     def handleRequest(request: HttpServerRequest[ByteBuf], response: HttpServerResponse[ByteBuf]) = {
         val path = request.getPath.split("/").toList.drop(1)
         val method = request.getHttpMethod.name().toUpperCase()
