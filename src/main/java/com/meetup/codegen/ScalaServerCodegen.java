@@ -35,7 +35,8 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
     private enum Arg {
         ARTIFACT_NAME("server", "The artifact name"),
         ARTIFACT_ORGANIZATION("com.meetup", "The artifact organization"),
-        ARTIFACT_VERSION("1.0.0-SNAPSHOT", "The artifact version");
+        ARTIFACT_VERSION("1.0.0-SNAPSHOT", "The artifact version"),
+        INCLUDE_SERIALIZATION("true", "To include or not include serializers in the model classes");
 
         public final String value;
         public final String description;
@@ -159,6 +160,9 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
 
         additionalProperties.put(CodegenConstants.INVOKER_PACKAGE, invokerPackage);
 
+        final boolean includeSerialization = Boolean.parseBoolean((String)additionalProperties.get(Arg.INCLUDE_SERIALIZATION.argument));
+        additionalProperties.put(Arg.INCLUDE_SERIALIZATION.argument, includeSerialization);
+
         // Now add supporting files as their location depends on the above logic.
         supportingFiles.add(new SupportingFile("server/build.sbt.mustache", "build.sbt"));
         supportingFiles.add(new SupportingFile("server/build.properties.mustache", "project/build.properties"));
@@ -172,15 +176,17 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
         supportingFiles.add(new SupportingFile("server/Server.mustache", invokerFolder, "Server.scala"));
 
         // common
-        supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
-        supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
+        if (includeSerialization) {
+            supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
+            supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
+        }
 
-
-        // TODO this should be a generator option
-        additionalProperties.put("json4s", "true");
-        additionalProperties.put("jsonTypePackage", "org.json4s");
-        additionalProperties.put("jsonType", "JValue");
-        supportingFiles.add(new SupportingFile("parserJson4s.mustache", invokerFolder, "Parser.scala"));
+        if (includeSerialization) {
+            additionalProperties.put("json4s", "true");
+            additionalProperties.put("jsonTypePackage", "org.json4s");
+            additionalProperties.put("jsonType", "JValue");
+            supportingFiles.add(new SupportingFile("parserJson4s.mustache", invokerFolder, "Parser.scala"));
+        }
     }
 
     /**

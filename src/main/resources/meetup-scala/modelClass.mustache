@@ -3,10 +3,27 @@ final case class {{classname}} (
 {{/description}}  {{name}}: {{#required}}{{#isEnum}}{{classname}}.{{datatypeWithEnum}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}{{/required}}{{^required}}Option[{{#isEnum}}{{classname}}.{{datatypeWithEnum}}{{/isEnum}}{{^isEnum}}{{datatype}}{{/isEnum}}]{{/required}}{{#hasMore}},{{/hasMore}}{{^hasMore}}){{#parent}} extends {{parent}}{{/parent}}{{/hasMore}}
 {{/vars}}
 
+
+{{#hasEnums}}
 object {{classname}} {
   {{#hasEnums}}{{#vars}}{{#isEnum}}{{>modelEnum}}{{/isEnum}}{{/vars}}{{/hasEnums}}
+
+  {{#includeSerialization}}
+  import {{invokerPackage}}.Codec
+
+  {{#json4s}}implicit val {{classname}}Codec = {{>codecJson4s}}{{/json4s}}
+  {{/includeSerialization}}
+}
+{{/hasEnums}}
+
+{{^hasEnums}}
+{{#includeSerialization}}
+object {{classname}} {
 
   import {{invokerPackage}}.Codec
 
   {{#json4s}}implicit val {{classname}}Codec = {{>codecJson4s}}{{/json4s}}
+
 }
+{{/includeSerialization}}
+{{/hasEnums}}
