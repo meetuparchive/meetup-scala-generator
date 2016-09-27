@@ -176,15 +176,17 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
         supportingFiles.add(new SupportingFile("server/Server.mustache", invokerFolder, "Server.scala"));
 
         // common
-        supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
-        supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
+        if (includeSerialization) {
+            supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
+            supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
+        }
 
-
-        // TODO this should be a generator option
-        additionalProperties.put("json4s", "true");
-        additionalProperties.put("jsonTypePackage", "org.json4s");
-        additionalProperties.put("jsonType", "JValue");
-        supportingFiles.add(new SupportingFile("parserJson4s.mustache", invokerFolder, "Parser.scala"));
+        if (includeSerialization) {
+            additionalProperties.put("json4s", "true");
+            additionalProperties.put("jsonTypePackage", "org.json4s");
+            additionalProperties.put("jsonType", "JValue");
+            supportingFiles.add(new SupportingFile("parserJson4s.mustache", invokerFolder, "Parser.scala"));
+        }
     }
 
     /**
