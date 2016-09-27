@@ -1,0 +1,40 @@
+package {{package}}
+{{#operations}}
+{{#imports}}import {{import}}
+{{/imports}}
+
+import io.netty.buffer.ByteBuf
+import io.netty.handler.codec.http.HttpResponseStatus
+import io.reactivex.netty.protocol.http.server.{HttpServerRequest, HttpServerResponse, RequestHandler}
+
+object {{classname}}Router {
+    def handleRequest(request: HttpServerRequest[ByteBuf], response: HttpServerResponse[ByteBuf]) = {
+        val path = request.getPath.split("/").toList.drop(1)
+        val method = request.getHttpMethod.name().toUpperCase()
+
+        (path, method) match {
+{{#operation}}
+          case ({{{vendorExtensions.x-meetup-scala-op-case}}} :: Nil, "{{httpMethod}}") =>
+          fakeResponse(response)
+{{/operation}}
+           case _ => notFoundResponse(response)
+         }
+     }
+     def fakeResponse(response: HttpServerResponse[ByteBuf]) = {
+       response.setStatus(HttpResponseStatus.OK)
+       response.writeString("Hello")
+       response.close(true)
+     }
+
+     def notFoundResponse(response: HttpServerResponse[ByteBuf]) = {
+       response.setStatus(HttpResponseStatus.NOT_FOUND)
+       response.writeString("Service not found")
+       response.close(true)
+     }
+
+}
+{{/operations}}
+
+
+
+

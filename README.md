@@ -11,7 +11,19 @@ included for convenience.
 This will have produced a jar of the generator, which we can now use for
 code generation:
 
+### Generate a client
 `CP=target/meetup-scala-client-0.0.1.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-client -o generated`
+
+### Generate a server
+`CP=target/meetup-scala-0.0.1-SNAPSHOT.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-server -o generated`
+
+The name of the runnable Main object or objects generated is based on the tags used in the swagger definition file.  The swagger
+generator groups together API endpoints into separate classfiles based on their tags.  If no tags are used, a `DefaultApiMain`
+is generated.  In the example swagger provided, the endpoints are tagged with `subscription` and `SubscriptionApiMain` is
+generated.  If endpoints are tagged differently, then multiple `Main` classes will be generated, each providing only the
+grouped endpoints corresponding to one tag (or default).
+
+---
 
 This uses the `swagger-codegen` script to run the [swagger-codegen CLI](https://github.com/swagger-api/swagger-codegen),
 which is included in the same directory for convenience.
