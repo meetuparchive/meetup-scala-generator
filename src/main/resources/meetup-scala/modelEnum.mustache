@@ -20,7 +20,7 @@ object {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{cla
    */
   def fromValue(value: {{#dataType}}{{.}}{{/dataType}}{{^dataType}}{{datatype}}{{/dataType}}): Option[{{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}] = valueMap.get(value)
 
-  {{^modelsOnly}}
+  {{#includeSerialization}}
   import {{invokerPackage}}.Codec
   import org.json4s._
 
@@ -42,5 +42,5 @@ object {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{cla
       }
 
   }
-  {{/modelsOnly}}
+  {{#includeSerialization}}
 }
