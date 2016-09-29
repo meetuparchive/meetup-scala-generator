@@ -1,3 +1,8 @@
+enablePlugins(
+  CommonSettingsPlugin,
+  CoverallsWrapper
+)
+
 name := "meetup-scala"
 
 organization := "com.meetup"
