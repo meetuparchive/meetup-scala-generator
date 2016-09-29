@@ -1,10 +1,10 @@
 package com.meetup.codegen
 
-import java.util.{Arrays => JArrays, HashMap => JHashMap, List => JList, Map => JMap}
+import java.util.{ Arrays => JArrays, HashMap => JHashMap, List => JList, Map => JMap }
 import java.util.Collections
 import io.swagger.models.ModelImpl
-import io.swagger.models.properties.{IntegerProperty, StringProperty}
-import org.scalatest.{FunSpec, Matchers}
+import io.swagger.models.properties.{ IntegerProperty, StringProperty }
+import org.scalatest.{ FunSpec, Matchers }
 import scala.collection.JavaConverters._
 
 class ModelEnumTest extends FunSpec with Matchers {
@@ -118,7 +118,8 @@ class ModelEnumTest extends FunSpec with Matchers {
             .asScala
             .map(_.get("name"))
 
-        actualNames.forall(expectedNames.contains) shouldBe true}
+        actualNames.forall(expectedNames.contains) shouldBe true
+      }
     }
 
     it("should have enum instance values properly escaped") {
