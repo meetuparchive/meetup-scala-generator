@@ -1,14 +1,13 @@
 enablePlugins(
   BuildInfoPlugin,
   CoverallsWrapper,
-  DockerPackagePlugin
+  DockerPackagePlugin,
+  CommonSettingsPlugin
 )
 
 name := "{{artifactName}}"
 
 organization := "{{artifactOrganization}}"
-
-version := "{{artifactVersion}}"
 
 scalaVersion := "2.11.8"
 
