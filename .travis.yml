@@ -14,7 +14,6 @@ before_install:
   - envtpl < .nexuscredential > "$HOME/.ivy2/.credentials"
   - export CI_BUILD_NUMBER=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $CI_BUILD_NUMBER; else echo "${TRAVIS_BUILD_NUMBER}-SNAPSHOT"; fi)
   - echo "CI_BUILD_NUMBER=${CI_BUILD_NUMBER}"
-  - docker login --email not@val.id --username travis --password $DOCKER_PASS mup.cr
 
 script:
   - make $(if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "${TRAVIS_BRANCH}" = "master" ]; then echo publish; else echo package; fi)
