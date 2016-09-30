@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/meetup/meetup-scala-generator.svg?token=FbswwsCsDvuHxrWDF4fU&branch=SGT-25_travis_config)](https://travis-ci.com/meetup/meetup-scala-generator)
+
 ## Running the Code Generator
 
 Clone this repository, `cd` to the resulting project directory, and then build
