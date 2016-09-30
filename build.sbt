@@ -1,6 +1,5 @@
 enablePlugins(
-  CommonSettingsPlugin,
-  CoverallsWrapper
+  CommonSettingsPlugin
 )
 
 name := "meetup-scala-generator"

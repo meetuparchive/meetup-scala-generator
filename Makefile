@@ -27,12 +27,7 @@ no_op__:
 
 __package-sbt:
 	sbt clean \
-	"set coverageEnabled := true" \
-	"set coverageOutputHTML := false" \
 	test \
-	coverageReport \
-	coverallsMaybe \
-	coverageOff \
 	publishLocal \
 	component:test
 
