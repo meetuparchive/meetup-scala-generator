@@ -3,7 +3,7 @@ enablePlugins(
   CoverallsWrapper
 )
 
-name := "meetup-scala"
+name := "meetup-scala-generator"
 
 organization := "com.meetup"
 
