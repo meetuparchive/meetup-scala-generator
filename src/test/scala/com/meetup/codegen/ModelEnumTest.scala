@@ -1,10 +1,10 @@
 package com.meetup.codegen
 
-import java.util.{ Arrays => JArrays, HashMap => JHashMap, List => JList, Map => JMap }
+import java.util.{Arrays => JArrays, HashMap => JHashMap, List => JList, Map => JMap}
 import java.util.Collections
 import io.swagger.models.ModelImpl
-import io.swagger.models.properties.{ IntegerProperty, StringProperty }
-import org.scalatest.{ FunSpec, Matchers }
+import io.swagger.models.properties.{IntegerProperty, StringProperty}
+import org.scalatest.{FunSpec, Matchers}
 import scala.collection.JavaConverters._
 
 class ModelEnumTest extends FunSpec with Matchers {
@@ -62,9 +62,9 @@ class ModelEnumTest extends FunSpec with Matchers {
 
     /*
      * The Swagger codegen tool uses a mutable model throughout the generation
-     * process. Here, post processing actually mutates the inners of the
+     * process. Here, post processing actually mutates the innards of the
      * resulting CodegenModel to add enum-specific properties. This is worth
-     * noting as, has we not run it through postProcessModels, the tests on
+     * noting as, had we not run it through postProcessModels, the tests on
      * those properties would fail.
      */
 
@@ -108,7 +108,7 @@ class ModelEnumTest extends FunSpec with Matchers {
 
         val expectedNames =
           rawAllowedValues.map { v =>
-            codeGen.toEnumVarName(v, property.baseType)
+            codeGen.toEnumVarName(v, property.datatype)
           }.toSet
 
         val actualNames =
