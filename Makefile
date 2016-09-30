@@ -35,7 +35,6 @@ __package-sbt:
 	coverageOff \
 	publishLocal \
 	component:test
-	cd src/component/sbt && sbt component:test
 
 __publish-sbt: __package-sbt
 	sbt publish cleanLocal
