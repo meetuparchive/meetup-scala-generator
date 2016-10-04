@@ -4,6 +4,7 @@ import io.swagger.codegen.*;
 import io.swagger.models.properties.ArrayProperty;
 import io.swagger.models.properties.MapProperty;
 import io.swagger.models.properties.Property;
+import io.swagger.models.properties.StringProperty;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -155,12 +156,20 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
 
         typeMapping = new HashMap<>();
         typeMapping.put("array", "List");
+        typeMapping.put("date", "LocalDate");
         typeMapping.put("DateTime", "ZonedDateTime");
         typeMapping.put("long", "Long");
         typeMapping.put("int", "Int");
         typeMapping.put("Integer", "Int");
 
-        importMapping.put("Date", "LocalDate");
+        typeMapping.put("timestamp", "Instant");
+        importMapping.put("Instant", "java.time.Instant");
+
+        typeMapping.put("local-time", "LocalTime");
+        importMapping.put("LocalTime", "java.time.LocalTime");
+
+        typeMapping.put("local-date-time", "LocalDateTime");
+        importMapping.put("LocalDateTime", "java.time.LocalDateTime");
     }
 
     @Override
@@ -267,7 +276,20 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
      */
     @Override
     public String getSwaggerType(Property p) {
-        String swaggerType = super.getSwaggerType(p);
+        String swaggerType;
+
+        Set<String> types = new HashSet<>();
+        types.addAll(Arrays.asList(
+                "timestamp",
+                "local-time",
+                "local-date-time"));
+
+        if(p.getClass().equals(StringProperty.class) && types.contains(p.getFormat())) {
+            swaggerType = p.getFormat();
+        } else {
+            swaggerType = super.getSwaggerType(p);
+        }
+
         String type;
         if (typeMapping.containsKey(swaggerType)) {
             type = typeMapping.get(swaggerType);
