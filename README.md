@@ -271,3 +271,12 @@ final case class Rectangle (
   /* The width of the rectangle */
   width: Int) extends Shape
 ```
+
+## Additional Date and Time Types
+
+Data types in swagger have an optional modifier, `[format](http://swagger.io/specification/#dataTypeFormat)`.
+This is an open string-valued property that can be used to further inform the generator of a more specific
+type. This generator exploits this modifier for `string` properties to add the following additional date/time
+properties: `timestamp`, `local-time`, and `local-date-time`.
+
+Further, these types are mapped to `java.time.{Instant, LocalTime, LocalDateTime}`, respectively.
