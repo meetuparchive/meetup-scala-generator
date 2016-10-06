@@ -1,5 +1,6 @@
 enablePlugins(
-  CommonSettingsPlugin
+  CommonSettingsPlugin,
+  NexusPlugin
 )
 
 name := "meetup-scala-generator"
