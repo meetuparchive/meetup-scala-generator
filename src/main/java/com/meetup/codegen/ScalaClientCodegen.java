@@ -26,7 +26,7 @@ public class ScalaClientCodegen extends DefaultCodegen implements CodegenConfig 
     }
 
     static {
-        NUMBER_TYPES.addAll(Arrays.asList("Integer", "Long", "Float", "Double"));
+        NUMBER_TYPES.addAll(Arrays.asList("Int", "Long", "Float", "Double"));
     }
 
     /**

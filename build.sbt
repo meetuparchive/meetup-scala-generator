@@ -1,4 +1,8 @@
-name := "meetup-scala"
+enablePlugins(
+  CommonSettingsPlugin
+)
+
+name := "meetup-scala-generator"
 
 organization := "com.meetup"
 
@@ -9,6 +13,8 @@ crossPaths := false
 autoScalaLibrary := false
 
 scalaVersion := "2.11.8"
+
+javacOptions in doc := Seq("-encoding", "UTF-8")
 
 libraryDependencies ++= Seq(
   "io.swagger" % "swagger-codegen" % "2.2.0",
