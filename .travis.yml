@@ -30,3 +30,13 @@ global_env: CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
 group: stable
 dist: trusty
 os: linux
+
+notifications:
+  slack:
+    secure: y+djlfX+iCCzGFWKN36WO0eoBmRo+FoZMNoG72pVYPC6ysdT8TbG8e/sskbqPpSuc0Ngtf2E+gCTRfZ3fJNrkh8Or2+t1bx+jyFp1/i8dsEQRhbWUmgcQkK37rZ25fO7RDiH3N0UlJ+HIyCG2rbWJw8UFuRRyuwolR1dcVg6bRWianGoaFNVKMBa1Sa6L7vlYazmo6iOOIXGZceUnx2m9xjEeqNiAPOkbNh64pezr3fz6U305NHo3sY5HGqa0VYXop9x6tylX6WRVT2AYGJwhDY4z1ChjVl1Qk3L3aHxTrXvclYkLi5P0xBUSPmU9YP41Gmuqx8jRf5BN9iotH0UdDgDbV2d+J24+0JoujR4suPzjy2HQvV2TEJ5Yqp/3oRsLjjDq+40YR8E/RBM801ttJa6nFoF2e1NwTNCxSdCUv9D84BipmsEUPouOMw+OOngMgsy40KSI8hj0e7ydKs5JLJ3acV2PKoZFPuOjWlzUo4gRim4Vv/DdDxSkcEL0iVRNdtTO1mbuq/Hrh4XGrmpOPGRO0RsFZYtCidY5Y0yrXPf6REc/tqMDjwOpOdXIaWk+Hlw4cOYOBJ1yNs0QEGI3cPj+LBRmnAmFu7LzlS+40c5jTT+psrIEXEXl5+KiGUGoWJJ5B+PxTBRuGuSQrJ3H5Dou52EiEcYn+pcTwexC/Q=
+
+  # dont notify successful builds - consider 'change'
+  on_success: never
+
+  # always notify build failures - consider 'change'
+  on_failure: always
