@@ -7,8 +7,6 @@ name := "meetup-scala-generator"
 
 organization := "com.meetup"
 
-version := "0.0.1-SNAPSHOT"
-
 crossPaths := false
 
 autoScalaLibrary := false
