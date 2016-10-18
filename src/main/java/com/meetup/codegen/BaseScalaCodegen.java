@@ -18,16 +18,6 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     protected String invokerPackage = "io.swagger";
     protected String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
 
-    /**
-     * Api Package. Optional, if needed, this can be used in templates
-     */
-    protected String apiPackage = "com.meetup.foo.api";
-
-    /*
-     * Model Package.  Optional, if needed, this can be used in templates
-     */
-    protected String modelPackage = "io.swagger.client.model";
-
     private static final Set<String> NUMBER_TYPES =
             new HashSet<>(Arrays.asList("Int", "Long", "Float", "Double"));
 
@@ -45,9 +35,23 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
         templateDir = "meetup-scala";
 
         /*
-         * Reserved words.  Override this with reserved words specific to your language
+         * Api Package. Optional, if needed, this can be used in templates
          */
-        reservedWords = new HashSet<>(); // TODO add scala (and template?) reserved words
+        apiPackage = "com.meetup.foo.api";
+
+        /*
+         * Model Package.  Optional, if needed, this can be used in templates
+         */
+        modelPackage = "io.swagger.client.model";
+
+        reservedWords = new HashSet<>(
+                Arrays.asList(
+                        "abstract", "case", "catch", "class", "def", "do", "else", "extends",
+                        "false", "final", "finally", "for", "forSome", "if", "implicit",
+                        "import", "lazy", "match", "new", "null", "object", "override",
+                        "package", "private", "protected", "return", "sealed", "super",
+                        "this", "throw", "trait", "try", "true", "type", "val", "var",
+                        "while", "with", "yield"));
 
         languageSpecificPrimitives = new HashSet<>(
                 Arrays.asList(
@@ -60,14 +64,6 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
                         "Map",
                         "String")
         );
-
-        setReservedWordsLowerCase(Arrays.asList(
-                "abstract", "case", "catch", "class", "def", "do", "else", "extends",
-                "false", "final", "finally", "for", "forSome", "if", "implicit",
-                "import", "lazy", "match", "new", "null", "object", "override",
-                "package", "private", "protected", "return", "sealed", "super",
-                "this", "throw", "trait", "try", "true", "type", "val", "var",
-                "while", "with", "yield"));
 
         instantiationTypes.put("date-time", "ZonedDateTime");
         instantiationTypes.put("array", "List");
