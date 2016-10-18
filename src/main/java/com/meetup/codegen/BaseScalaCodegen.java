@@ -18,14 +18,8 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     protected String invokerPackage = "io.swagger";
     protected String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
 
-    /*
-     * Template Location.  This is the location which templates will be read from.  The generator
-     * will use the resource stream to attempt to read the templates.
-     */
-    protected String templateDir = "meetup-scala";
-
     /**
-     * Api Package.  Optional, if needed, this can be used in templates
+     * Api Package. Optional, if needed, this can be used in templates
      */
     protected String apiPackage = "com.meetup.foo.api";
 
@@ -34,7 +28,8 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
      */
     protected String modelPackage = "io.swagger.client.model";
 
-    private static final Set<String> NUMBER_TYPES = new HashSet<>();
+    private static final Set<String> NUMBER_TYPES =
+            new HashSet<>(Arrays.asList("Int", "Long", "Float", "Double"));
 
     public static Set<String> getNumberTypes() {
         Set<String> copy = new HashSet<>();
@@ -42,20 +37,18 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
         return copy;
     }
 
-    static {
-        NUMBER_TYPES.addAll(Arrays.asList("Int", "Long", "Float", "Double"));
-    }
-
     BaseScalaCodegen() {
+        /*
+         * Template Location.  This is the location which templates will be read from.  The generator
+         * will use the resource stream to attempt to read the templates.
+         */
+        templateDir = "meetup-scala";
+
         /*
          * Reserved words.  Override this with reserved words specific to your language
          */
         reservedWords = new HashSet<>(); // TODO add scala (and template?) reserved words
 
-        /*
-         * Language Specific Primitives.  These types will not trigger imports by
-         * the client generator
-         */
         languageSpecificPrimitives = new HashSet<>(
                 Arrays.asList(
                         "Boolean",
@@ -67,6 +60,14 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
                         "Map",
                         "String")
         );
+
+        setReservedWordsLowerCase(Arrays.asList(
+                "abstract", "case", "catch", "class", "def", "do", "else", "extends",
+                "false", "final", "finally", "for", "forSome", "if", "implicit",
+                "import", "lazy", "match", "new", "null", "object", "override",
+                "package", "private", "protected", "return", "sealed", "super",
+                "this", "throw", "trait", "try", "true", "type", "val", "var",
+                "while", "with", "yield"));
 
         instantiationTypes.put("date-time", "ZonedDateTime");
         instantiationTypes.put("array", "List");
