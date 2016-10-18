@@ -10,25 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.util.*;
 
-public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig {
-
-    private String invokerPackage = "io.swagger";
-
-    // source folder where to write the files
-    private final String sourceFolder = "src/main/scala";
-    private String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
-
-    private static final Set<String> NUMBER_TYPES = new HashSet<>();
-
-    public static Set<String> getNumberTypes() {
-        Set<String> copy = new HashSet<>();
-        copy.addAll(NUMBER_TYPES);
-        return copy;
-    }
-
-    static {
-        NUMBER_TYPES.addAll(Arrays.asList("Int", "Long", "Float", "Double"));
-    }
+public class ScalaServerCodegen extends BaseScalaCodegen {
 
     /**
      * Arguments supported by this generator.
@@ -69,15 +51,11 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
         return "meetup-scala-server";
     }
 
-    public String getHelp() {
-        return "Generates " + getName() + " library.";
-    }
-
     public ScalaServerCodegen() {
         super();
 
         // set the output folder here
-        outputFolder = "generated-code/meetup-scala-server";
+        outputFolder = "generated-code/" + getName();
 
         for (Arg d : Arg.values()) {
             cliOptions.add(CliOption.newString(d.argument, d.description));
@@ -123,50 +101,6 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
          * Model Package.  Optional, if needed, this can be used in templates
          */
         modelPackage = "io.swagger.client.model";
-
-        /*
-         * Reserved words.  Override this with reserved words specific to your language
-         */
-        reservedWords = new HashSet<>(); // TODO add scala (and template?) reserved words
-
-        /*
-         * Language Specific Primitives.  These types will not trigger imports by
-         * the client generator
-         */
-        languageSpecificPrimitives = new HashSet<>(
-                Arrays.asList(
-                        "Boolean",
-                        "Double",
-                        "Float",
-                        "Int",
-                        "Long",
-                        "List",
-                        "Map",
-                        "String")
-        );
-
-        instantiationTypes.put("date-time", "ZonedDateTime");
-        instantiationTypes.put("array", "List");
-        instantiationTypes.put("integer", "Int");
-
-        importMapping.put("ZonedDateTime", "java.time.ZonedDateTime");
-
-        typeMapping = new HashMap<>();
-        typeMapping.put("array", "List");
-        typeMapping.put("date", "LocalDate");
-        typeMapping.put("DateTime", "ZonedDateTime");
-        typeMapping.put("long", "Long");
-        typeMapping.put("int", "Int");
-        typeMapping.put("Integer", "Int");
-
-        typeMapping.put("timestamp", "Instant");
-        importMapping.put("Instant", "java.time.Instant");
-
-        typeMapping.put("local-time", "LocalTime");
-        importMapping.put("LocalTime", "java.time.LocalTime");
-
-        typeMapping.put("local-date-time", "LocalDateTime");
-        importMapping.put("LocalDateTime", "java.time.LocalDateTime");
     }
 
     @Override
@@ -180,6 +114,7 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
         }
 
         // Set the invoker package and folder to the artifact organization + client.
+        // TODO this should be shared --------->
         invokerPackage =
                 additionalProperties.get(Arg.ARTIFACT_ORGANIZATION.argument).toString() +
                         "." + additionalProperties.get(Arg.ARTIFACT_NAME.argument).toString();
@@ -192,6 +127,17 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
         final boolean includeSerialization = Boolean.parseBoolean((String)additionalProperties.get(Arg.INCLUDE_SERIALIZATION.argument));
         additionalProperties.put(Arg.INCLUDE_SERIALIZATION.argument, includeSerialization);
 
+        if (includeSerialization) {
+            supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
+            supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
+            supportingFiles.add(new SupportingFile("parserJson4s.mustache", invokerFolder, "Parser.scala"));
+
+            additionalProperties.put("json4s", "true");
+            additionalProperties.put("jsonTypePackage", "org.json4s");
+            additionalProperties.put("jsonType", "JValue");
+        }
+        // TODO <---------
+
         // Now add supporting files as their location depends on the above logic.
         supportingFiles.add(new SupportingFile("server/build.sbt.mustache", "build.sbt"));
         supportingFiles.add(new SupportingFile("server/build.properties.mustache", "project/build.properties"));
@@ -203,122 +149,7 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
         supportingFiles.add(new SupportingFile("server/RainbowsHandler.mustache", invokerFolder, "RainbowsHandler.scala"));
         supportingFiles.add(new SupportingFile("server/RequestLoggingHandler.mustache", invokerFolder, "RequestLoggingHandler.scala"));
         supportingFiles.add(new SupportingFile("server/Server.mustache", invokerFolder, "Server.scala"));
-
-        // common
-        if (includeSerialization) {
-            supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
-            supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
-        }
-
-        if (includeSerialization) {
-            additionalProperties.put("json4s", "true");
-            additionalProperties.put("jsonTypePackage", "org.json4s");
-            additionalProperties.put("jsonType", "JValue");
-            supportingFiles.add(new SupportingFile("parserJson4s.mustache", invokerFolder, "Parser.scala"));
-        }
     }
-
-    /**
-     * Escapes a reserved word as defined in the `reservedWords` array. Handle escaping
-     * those terms here.  This logic is only called if a variable matches the reseved words
-     *
-     * @return the escaped term
-     */
-    @Override
-    public String escapeReservedWord(String name) {
-        return "`" + name + "`";
-    }
-
-    /**
-     * Location to write model files.  You can use the modelPackage() as defined when the class is
-     * instantiated
-     */
-    public String modelFileFolder() {
-        return outputFolder + "/" + sourceFolder + "/" + modelPackage().replace('.', File.separatorChar);
-    }
-
-    /**
-     * Location to write api files.  You can use the apiPackage() as defined when the class is
-     * instantiated
-     */
-    @Override
-    public String apiFileFolder() {
-        return outputFolder + "/" + sourceFolder + "/" + apiPackage().replace('.', File.separatorChar);
-    }
-
-
-    /**
-     * Optional - type declaration.  This is a String which is used by the templates to instantiate your
-     * types.  There is typically special handling for different property types
-     *
-     * @return a string value used as the `dataType` field for model templates, `returnType` for api templates
-     */
-    @Override
-    public String getTypeDeclaration(Property p) {
-        String type;
-        if (p instanceof ArrayProperty) {
-            ArrayProperty ap = (ArrayProperty) p;
-            Property inner = ap.getItems();
-            type = getSwaggerType(p) + "[" + getTypeDeclaration(inner) + "]";
-        } else if (p instanceof MapProperty) {
-            MapProperty mp = (MapProperty) p;
-            Property inner = mp.getAdditionalProperties();
-            type = getSwaggerType(p) + "[String, " + getTypeDeclaration(inner) + "]";
-        } else {
-            type = super.getTypeDeclaration(p);
-        }
-        return type;
-    }
-
-    /**
-     * Optional - swagger type conversion.  This is used to map swagger types in a `Property` into
-     * either language specific types via `typeMapping` or into complex models if there is not a mapping.
-     *
-     * @return a string value of the type or complex model for this property
-     * @see io.swagger.models.properties.Property
-     */
-    @Override
-    public String getSwaggerType(Property p) {
-        String swaggerType;
-
-        Set<String> types = new HashSet<>();
-        types.addAll(Arrays.asList(
-                "timestamp",
-                "local-time",
-                "local-date-time"));
-
-        if(p.getClass().equals(StringProperty.class) && types.contains(p.getFormat())) {
-            swaggerType = p.getFormat();
-        } else {
-            swaggerType = super.getSwaggerType(p);
-        }
-
-        String type;
-        if (typeMapping.containsKey(swaggerType)) {
-            type = typeMapping.get(swaggerType);
-            if (languageSpecificPrimitives.contains(type))
-                return toModelName(type);
-        } else
-            type = swaggerType;
-        return toModelName(type);
-    }
-
-    @Override
-    public Map<String, Object> postProcessModels(Map<String, Object> objs) {
-        // import sanitization lifted from ScalaClientCodegen
-        @SuppressWarnings("unchecked")
-        List<Map<String, String>> imports = (List<Map<String, String>>) objs.get("imports");
-        final String prefix = modelPackage() + ".";
-        Iterator<Map<String, String>> iterator = imports.iterator();
-        while (iterator.hasNext()) {
-            String _import = iterator.next().get("import");
-            if (_import.startsWith(prefix)) iterator.remove();
-        }
-
-        // Now subject the models to Enum treatment.
-        return postProcessModelsEnum(objs);
-    }
-
 
     @Override
     public Map<String, Object> postProcessOperations(Map<String, Object> objs) {
@@ -349,34 +180,4 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
         return objs;
     }
 
-    @Override
-    public String toEnumName(CodegenProperty property) {
-        return camelize(property.name.split("_"));
-    }
-
-    public static String camelize(String[] parts) {
-        StringBuilder sb = new StringBuilder();
-        for(String s : parts) {
-            sb.append(StringUtils.capitalize(s));
-        }
-        return sb.toString();
-    }
-
-    @Override
-    public String toEnumVarName(String value, String datatype) {
-        if (NUMBER_TYPES.contains(datatype)) {
-            return "Number" + value;
-        } else {
-            return camelize(value.split("[ _]"));
-        }
-    }
-
-    @Override
-    public String toEnumValue(String value, String datatype) {
-        if (NUMBER_TYPES.contains(datatype)) {
-            return value;
-        } else {
-            return "\"" + escapeText(value).toLowerCase() + "\"";
-        }
-    }
 }
