@@ -1,6 +1,5 @@
 package com.meetup.codegen;
 
-import io.swagger.codegen.CliOption;
 import io.swagger.codegen.CodegenConfig;
 import io.swagger.codegen.CodegenProperty;
 import io.swagger.codegen.DefaultCodegen;
@@ -18,6 +17,22 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     protected String sourceFolder = "src/main/scala";
     protected String invokerPackage = "io.swagger";
     protected String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
+
+    /*
+     * Template Location.  This is the location which templates will be read from.  The generator
+     * will use the resource stream to attempt to read the templates.
+     */
+    protected String templateDir = "meetup-scala";
+
+    /**
+     * Api Package.  Optional, if needed, this can be used in templates
+     */
+    protected String apiPackage = "com.meetup.foo.api";
+
+    /*
+     * Model Package.  Optional, if needed, this can be used in templates
+     */
+    protected String modelPackage = "io.swagger.client.model";
 
     private static final Set<String> NUMBER_TYPES = new HashSet<>();
 

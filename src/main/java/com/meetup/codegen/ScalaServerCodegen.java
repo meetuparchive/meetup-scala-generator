@@ -12,6 +12,9 @@ import java.util.*;
 
 public class ScalaServerCodegen extends BaseScalaCodegen {
 
+    protected String invokerPackage = "io.swagger";
+    protected String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
+
     /**
      * Arguments supported by this generator.
      */
@@ -86,21 +89,9 @@ public class ScalaServerCodegen extends BaseScalaCodegen {
                  "api.mustache",   // the template to use
                  ".scala");       // the extension for each file to write
 
-        /*
-         * Template Location.  This is the location which templates will be read from.  The generator
-         * will use the resource stream to attempt to read the templates.
-         */
-        templateDir = "meetup-scala";
-
-        /**
-         * Api Package.  Optional, if needed, this can be used in templates
-         */
-        apiPackage = "com.meetup.service";
-
-        /*
-         * Model Package.  Optional, if needed, this can be used in templates
-         */
-        modelPackage = "io.swagger.client.model";
+        apiTemplateFiles.put(
+                "server/Main.mustache",   // the template to use
+                "Main.scala");       // the extension for each file to write
     }
 
     @Override

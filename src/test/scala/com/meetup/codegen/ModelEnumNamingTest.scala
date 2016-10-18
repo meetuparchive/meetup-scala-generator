@@ -34,7 +34,7 @@ class ModelEnumNamingTest extends FunSpec with Matchers {
     }
 
     it("should prefix numeric values with the word \"Number\"") {
-      ScalaClientCodegen.getNumberTypes.asScala.foreach { t =>
+      BaseScalaCodegen.getNumberTypes.asScala.foreach { t =>
         val name = codeGen.toEnumVarName("1", t)
         name shouldBe "Number1"
       }
@@ -48,7 +48,7 @@ class ModelEnumNamingTest extends FunSpec with Matchers {
     }
 
     it("should do nothing for numeric values") {
-      ScalaClientCodegen.getNumberTypes.asScala.foreach { t =>
+      BaseScalaCodegen.getNumberTypes.asScala.foreach { t =>
         codeGen.toEnumValue("1", t) shouldBe "1"
       }
     }
