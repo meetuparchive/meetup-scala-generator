@@ -1,0 +1,24 @@
+package {{invokerPackage}}
+
+import io.netty.buffer.ByteBuf
+import io.reactivex.netty.protocol.http.server.RequestHandler
+import io.reactivex.netty.protocol.http.server.{HttpServerResponse, HttpServerRequest}
+
+/**
+ * 
+ *
+ */
+class Service(router: Router) {
+  val handler =
+    new RequestHandler[ByteBuf, ByteBuf] {
+      override def handle(request: HttpServerRequest[ByteBuf], response: HttpServerResponse[ByteBuf]) = {
+        router.handleRequest(request, response)
+      }
+  }
+    
+  def shutdown(): Unit = router.shutdown()
+}
+
+object Service {
+    def apply(router: Router) = new Service(router)
+}

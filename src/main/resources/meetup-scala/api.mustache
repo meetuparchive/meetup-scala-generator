@@ -3,10 +3,10 @@ package {{package}}
 {{#imports}}import {{import}}
 {{/imports}}
 
-object {{classname}} {
+trait {{classname}} {
 
 {{#operation}}
-  def {{operationId}}({{#allParams}}{{paramName}}: {{dataType}}{{#hasNext}}, {{/hasNext}}{{/allParams}}): {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = ???
+  def {{operationId}}({{#allParams}}{{paramName}}: {{dataType}}{{#hasNext}}, {{/hasNext}}{{/allParams}}): {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}
 {{/operation}}
 }
 {{/operations}}

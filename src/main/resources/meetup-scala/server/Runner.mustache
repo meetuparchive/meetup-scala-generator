@@ -13,12 +13,12 @@ trait Runner {
    * @param environment environment variables
    * @param args        command line arguments
    */
-  def initializeApplication(environment: Map[String, String], args: Array[String]): Application
+  def initializeService(environment: Map[String, String], args: Array[String]): Service
 
   final def main(args: Array[String]) {
     /* Initialize the application and server, and get shutdown function. */
 
-    val app = initializeApplication(sys.env, args)
+    val app = initializeService(sys.env, args)
     val (server, doShutdown) = Server(9000, app)
 
     if (Thread.currentThread().getName.startsWith("run-main-")) {

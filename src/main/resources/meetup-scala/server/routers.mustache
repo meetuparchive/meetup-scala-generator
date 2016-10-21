@@ -1,0 +1,102 @@
+package {{package}}
+{{#operations}}
+{{#imports}}import {{import}}
+{{/imports}}
+
+import io.netty.buffer.ByteBuf
+import io.netty.handler.codec.http.HttpResponseStatus
+import io.reactivex.netty.protocol.http.server.{HttpServerRequest, HttpServerResponse, RequestHandler}
+
+import io.netty.handler.codec.http.{HttpHeaderNames, HttpResponseStatus}
+
+import {{invokerPackage}}.{Router, ApiImpl, Serializer, Codec}
+
+import java.nio.charset.Charset
+
+import rx.lang.scala.JavaConversions.{toJavaObservable, toScalaObservable}
+import rx.lang.scala.{Observable => SObservable}
+import rx.functions.Func1
+import rx.{Observable => JObservable}
+
+class {{classname}}Router(api: {{classname}} with ApiImpl) extends Router(api) {
+    def handleRequest(request: HttpServerRequest[ByteBuf], response: HttpServerResponse[ByteBuf]): rx.Observable[Void] = {
+        val path = request.getPath.split("/").toList.drop(1)
+        val method = request.getHttpMethod.name().toUpperCase()
+
+        (path, method) match {
+{{#operation}}
+          case ({{{vendorExtensions.x-meetup-scala-op-case}}} :: Nil, "{{httpMethod}}") =>
+            {{#bodyParams}}
+            val body: rx.Observable[ByteBuf] = request
+              .getContent
+
+            val r: rx.Observable[Void] = body.flatMap {
+              new Func1[ByteBuf, rx.Observable[Void]]() {
+                override def call(byteBuf: ByteBuf): rx.Observable[Void] = {
+                  val json = byteBuf.toString(Charset.defaultCharset())
+                  val deserialized:Either[String, {{dataType}}] = Serializer.deserialize[{{dataType}}](json)
+                  deserialized match {
+                    case Right(content) =>
+                      val result:{{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}(content) // handle path params
+                      val r: JObservable[Void] = respond(result, response)
+                      r
+                    case Left(msg) =>
+                      badRequest(response)
+                  }
+                }
+              }
+            }
+            r
+            {{/bodyParams}}
+            
+            {{^bodyParams}}
+            api.{{operationId}}(
+            {{#pathParams}}
+            {{#isPathParam}}{{paramName}}.to{{dataType}}{{/isPathParam}}
+            {{#hasNext}}, {{/hasNext}}
+            {{/pathParams}})
+            fakeResponse(response)
+            {{/bodyParams}}
+{{/operation}}
+           case _ => notFoundResponse(response)
+         }
+     }
+
+     def respond[A](messageObj: A, response: HttpServerResponse[ByteBuf])(implicit codec: Codec[A]): rx.Observable[Void] = {
+         val message = Serializer.serialize(messageObj)
+         response.setStatus(HttpResponseStatus.OK)
+         val content: ByteBuf =
+             response.getAllocator
+             .buffer(message.length)
+             .writeBytes(message.getBytes)
+         val headers = response.getHeaders
+         headers.set(HttpHeaderNames.CONTENT_LENGTH, message.length)
+         headers.set(HttpHeaderNames.CONTENT_TYPE, "application/json")
+         response.write(content)
+         response.close(true)
+     }
+
+     def badRequest(response: HttpServerResponse[ByteBuf]) = {
+       response.setStatus(HttpResponseStatus.BAD_REQUEST)
+       response.writeString("Bad request")
+       response.close(true)
+     }
+     
+     def fakeResponse(response: HttpServerResponse[ByteBuf]) = {
+       response.setStatus(HttpResponseStatus.OK)
+       response.writeString("Hello")
+       response.close(true)
+     }
+
+     def notFoundResponse(response: HttpServerResponse[ByteBuf]) = {
+       response.setStatus(HttpResponseStatus.NOT_FOUND)
+       response.writeString("Service not found")
+       response.close(true)
+     }
+
+}
+{{/operations}}
+
+
+
+
