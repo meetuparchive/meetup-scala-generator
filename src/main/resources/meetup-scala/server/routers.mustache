@@ -97,6 +97,6 @@ class {{classname}}Router(api: {{classname}} with ApiImpl) extends Router(api) {
 }
 {{/operations}}
 
-
-
-
+object {{className}}Router {
+  def createService(api: {{classname}} with ApiImpl): Service = new Service(new {{className}}Router(api))
+}
