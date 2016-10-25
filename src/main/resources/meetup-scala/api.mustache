@@ -6,7 +6,7 @@ package {{package}}
 trait {{classname}} {
 
 {{#operation}}
-  def {{operationId}}({{#allParams}}{{paramName}}: {{dataType}}{{#hasNext}}, {{/hasNext}}{{/allParams}}): {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}
+  def {{operationId}}({{#allParams}}{{paramName}}: {{dataType}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}
 {{/operation}}
 }
 {{/operations}}
