@@ -336,7 +336,7 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
                     if (items[i].matches("^\\{(.*)\\}$")) { // wrap in {}
                         String itemWithoutBrackets = items[i].replace("{", "").replace("}", "");
 
-                        scalaPath = scalaPath + itemWithoutBrackets;
+                        scalaPath = scalaPath + toParamName(itemWithoutBrackets);
                     } else {
                         scalaPath = scalaPath + "\"" + items[i] + "\"";
                     }
