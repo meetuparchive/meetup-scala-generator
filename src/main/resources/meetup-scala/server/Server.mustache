@@ -8,20 +8,19 @@ import io.reactivex.netty.RxNetty
 import io.reactivex.netty.protocol.http.server.{ErrorResponseGenerator, HttpServer, HttpServerResponse, RequestHandler}
 
 object Server extends Logging {
-  def apply(portNumber: Int, application: Application): (HttpServer[ByteBuf, ByteBuf], () => Unit) = {
+  def apply(portNumber: Int, service: Service): (HttpServer[ByteBuf, ByteBuf], () => Unit) = {
     log.info("Server is starting up")
     /* Initialize the application and server. */
-    val server = mkServer(portNumber, application.handler)
+    val server = mkServer(portNumber, service.handler)
 
-    /* Construct a sane shutdown procedure for the server and application. */
+    /* Construct a sane shutdown procedure for the server and service. */
     val doShutdown: () => Unit = () => {
       log.info("Server is shutting down")
       server.shutdown()
       /* We call this here to make sure the server has terminated (no new
          connections and all active have terminated) before shutting down the
-         application services. */
+         services. */
       server.waitTillShutdown()
-      application.shutdown()
       log.info("Shutdown complete")
     }
 

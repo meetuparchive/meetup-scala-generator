@@ -101,16 +101,12 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
          */
 
         apiTemplateFiles.put(
-                "server/router.mustache",   // the template to use
+                "server/apiRouter.mustache",   // the template to use
                 "Router.scala");       // the extension for each file to write
 
         apiTemplateFiles.put(
                  "api.mustache",   // the template to use
                  ".scala");       // the extension for each file to write
-
-        apiTemplateFiles.put(
-                "server/Main.mustache",   // the template to use
-                "Main.scala");       // the extension for each file to write
 
         /*
          * Template Location.  This is the location which templates will be read from.  The generator
@@ -121,7 +117,7 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
         /**
          * Api Package.  Optional, if needed, this can be used in templates
          */
-        apiPackage = "com.meetup.foo.api";
+        apiPackage = "com.meetup.service";
 
         /*
          * Model Package.  Optional, if needed, this can be used in templates
@@ -201,8 +197,9 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
         supportingFiles.add(new SupportingFile("server/build.properties.mustache", "project/build.properties"));
         supportingFiles.add(new SupportingFile("server/plugins.sbt.mustache", "project/plugins.sbt"));
         supportingFiles.add(new SupportingFile("server/Makefile.mustache", "Makefile"));
-        supportingFiles.add(new SupportingFile("server/Application.mustache", invokerFolder, "Application.scala"));
+        supportingFiles.add(new SupportingFile("server/Service.mustache", invokerFolder, "Service.scala"));
         supportingFiles.add(new SupportingFile("server/Runner.mustache", invokerFolder, "Runner.scala"));
+        supportingFiles.add(new SupportingFile("server/Router.mustache", invokerFolder, "Router.scala"));
         supportingFiles.add(new SupportingFile("server/RainbowsHandler.mustache", invokerFolder, "RainbowsHandler.scala"));
         supportingFiles.add(new SupportingFile("server/RequestLoggingHandler.mustache", invokerFolder, "RequestLoggingHandler.scala"));
         supportingFiles.add(new SupportingFile("server/Server.mustache", invokerFolder, "Server.scala"));
@@ -339,7 +336,7 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
                     if (items[i].matches("^\\{(.*)\\}$")) { // wrap in {}
                         String itemWithoutBrackets = items[i].replace("{", "").replace("}", "");
 
-                        scalaPath = scalaPath + itemWithoutBrackets;
+                        scalaPath = scalaPath + toParamName(itemWithoutBrackets);
                     } else {
                         scalaPath = scalaPath + "\"" + items[i] + "\"";
                     }

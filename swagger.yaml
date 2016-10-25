@@ -34,7 +34,7 @@ paths:
             items:
               $ref: "#/definitions/Error"
 
-  /subscriptions/{id}:
+  /subscriptions/{id}/{secondId}:
     get:
       tags:
         - subscription
@@ -46,6 +46,12 @@ paths:
           format: int64
           required: true
           description: The subscription id.
+        - name: secondId
+          in: path
+          type: integer
+          format: int64
+          required: true
+          description: The secondary subscription id, as test
       responses:
         200:
           description: The subscriber owning the subscription.
