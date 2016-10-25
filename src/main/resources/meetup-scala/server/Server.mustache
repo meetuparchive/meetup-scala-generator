@@ -21,7 +21,6 @@ object Server extends Logging {
          connections and all active have terminated) before shutting down the
          services. */
       server.waitTillShutdown()
-      service.shutdown()
       log.info("Shutdown complete")
     }
 

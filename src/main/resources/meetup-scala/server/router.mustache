@@ -3,8 +3,6 @@ package {{invokerPackage}}
 import io.netty.buffer.ByteBuf
 import io.reactivex.netty.protocol.http.server.{HttpServerResponse, HttpServerRequest}
 
-abstract class Router(api: ApiImpl) {
-    type A <: ApiImpl
+abstract class Router[A](api: A) {
     def handleRequest(request: HttpServerRequest[ByteBuf], response: HttpServerResponse[ByteBuf]): rx.Observable[Void]
-    def shutdown(): Unit = api.shutdown()
 }
