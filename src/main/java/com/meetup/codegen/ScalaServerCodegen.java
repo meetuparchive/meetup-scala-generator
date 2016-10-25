@@ -101,7 +101,7 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
          */
 
         apiTemplateFiles.put(
-                "server/routers.mustache",   // the template to use
+                "server/apiRouter.mustache",   // the template to use
                 "Router.scala");       // the extension for each file to write
 
         apiTemplateFiles.put(
