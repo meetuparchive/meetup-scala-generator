@@ -199,7 +199,7 @@ public class ScalaServerCodegen extends DefaultCodegen implements CodegenConfig 
         supportingFiles.add(new SupportingFile("server/Makefile.mustache", "Makefile"));
         supportingFiles.add(new SupportingFile("server/Service.mustache", invokerFolder, "Service.scala"));
         supportingFiles.add(new SupportingFile("server/Runner.mustache", invokerFolder, "Runner.scala"));
-        supportingFiles.add(new SupportingFile("server/Router.mustache", invokerFolder, "Router.scala"));
+        supportingFiles.add(new SupportingFile("server/router.mustache", invokerFolder, "Router.scala"));
         supportingFiles.add(new SupportingFile("server/RainbowsHandler.mustache", invokerFolder, "RainbowsHandler.scala"));
         supportingFiles.add(new SupportingFile("server/RequestLoggingHandler.mustache", invokerFolder, "RequestLoggingHandler.scala"));
         supportingFiles.add(new SupportingFile("server/Server.mustache", invokerFolder, "Server.scala"));
