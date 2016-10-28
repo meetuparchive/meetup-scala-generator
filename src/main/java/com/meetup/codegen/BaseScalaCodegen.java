@@ -1,8 +1,6 @@
 package com.meetup.codegen;
 
-import io.swagger.codegen.CodegenConfig;
-import io.swagger.codegen.CodegenProperty;
-import io.swagger.codegen.DefaultCodegen;
+import io.swagger.codegen.*;
 import io.swagger.models.properties.ArrayProperty;
 import io.swagger.models.properties.MapProperty;
 import io.swagger.models.properties.Property;
@@ -12,7 +10,13 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.util.*;
 
+/**
+ * A base code generator for scala source. Currently this plays two roles:
+ * 1) providing some base settings
+ */
 abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig {
+
+    private static final String ARG_INCLUDE_SERIALIZATION = "includeSerialization";
 
     protected String sourceFolder = "src/main/scala";
     protected String invokerPackage = "io.swagger";
@@ -28,6 +32,11 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     }
 
     BaseScalaCodegen() {
+
+        outputFolder = "generated-code/" + getName();
+
+        cliOptions.add(CliOption.newBoolean(ARG_INCLUDE_SERIALIZATION, "To include or not include serializers in the model classes"));
+
         /*
          * Template Location.  This is the location which templates will be read from.  The generator
          * will use the resource stream to attempt to read the templates.
@@ -88,7 +97,29 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
 
     @Override
     public void processOpts() {
+        // TODO
         super.processOpts();
+//        invokerPackage =
+//                additionalProperties.get(Arg.ARTIFACT_ORGANIZATION.argument).toString() +
+//                        "." + additionalProperties.get(Arg.ARTIFACT_NAME.argument).toString();
+//        invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
+//
+//        modelPackage = invokerPackage + ".api.model";
+//        apiPackage = invokerPackage + ".api.api";
+        additionalProperties.put(CodegenConstants.INVOKER_PACKAGE, invokerPackage);
+
+        final boolean includeSerialization = Boolean.TRUE.toString().equals(additionalProperties.get(ARG_INCLUDE_SERIALIZATION));
+        additionalProperties.put(ARG_INCLUDE_SERIALIZATION, includeSerialization);
+
+        if (includeSerialization) {
+            supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
+            supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
+            supportingFiles.add(new SupportingFile("parserJson4s.mustache", invokerFolder, "Parser.scala"));
+
+            additionalProperties.put("json4s", "true");
+            additionalProperties.put("jsonTypePackage", "org.json4s");
+            additionalProperties.put("jsonType", "JValue");
+        }
     }
 
     @Override
