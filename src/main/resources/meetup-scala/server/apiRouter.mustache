@@ -50,7 +50,6 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
             {{^bodyParams}}
             api.{{operationId}}(
             {{#pathParams}}{{#isPathParam}}{{paramName}}.to{{dataType}}{{/isPathParam}}{{#hasMore}}, {{/hasMore}}{{/pathParams}})
-            fakeResponse(response)
             {{/bodyParams}}
 {{/operation}}
            case _ => notFoundResponse(response)
