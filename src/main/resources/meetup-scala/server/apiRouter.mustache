@@ -48,8 +48,10 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
             {{/bodyParams}}
             
             {{^bodyParams}}
-            api.{{operationId}}(
+            val result:{{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}(
             {{#pathParams}}{{#isPathParam}}{{paramName}}.to{{dataType}}{{/isPathParam}}{{#hasMore}}, {{/hasMore}}{{/pathParams}})
+            val r: JObservable[Void] = respond(result, response)
+            r
             {{/bodyParams}}
 {{/operation}}
            case _ => notFoundResponse(response)
