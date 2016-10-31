@@ -1,4 +1,4 @@
-new Codec[{{classname}}] {
+implicit val {{classname}}Codec = new Codec[{{classname}}] {
 
   import org.json4s._
   import org.json4s.native.Serialization
@@ -13,5 +13,21 @@ new Codec[{{classname}}] {
     } catch {
       case scala.util.control.NonFatal(e) => Left(e.getMessage)
     }
+}
 
+implicit val {{classname}}ListCodec = new Codec[List[{{classname}}]] {
+
+  import org.json4s._
+  import org.json4s.native.Serialization
+
+  implicit val formats = Serialization.formats(NoTypeHints)
+
+  def encode(a: List[{{classname}}]): JValue = Extraction.decompose(a)
+
+  def decode(j: JValue): Either[String, List[{{classname}}]] =
+    try {
+      Right(j.extract[List[{{classname}}]])
+    } catch {
+      case scala.util.control.NonFatal(e) => Left(e.getMessage)
+    }
 }
