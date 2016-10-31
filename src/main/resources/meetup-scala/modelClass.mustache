@@ -11,7 +11,7 @@ object {{classname}} {
   {{#includeSerialization}}
   import {{invokerPackage}}.Codec
 
-  {{#json4s}}implicit val {{classname}}Codec = {{>codecJson4s}}{{/json4s}}
+  {{#json4s}}{{>codecJson4s}}{{/json4s}}
   {{/includeSerialization}}
 }
 {{/hasEnums}}
@@ -22,7 +22,7 @@ object {{classname}} {
 
   import {{invokerPackage}}.Codec
 
-  {{#json4s}}implicit val {{classname}}Codec = {{>codecJson4s}}{{/json4s}}
+  {{#json4s}}{{>codecJson4s}}{{/json4s}}
 
 }
 {{/includeSerialization}}
