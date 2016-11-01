@@ -32,6 +32,8 @@ trait Runner {
       System.in.read()
       doShutdownServer()
       doShutdownService()
+      /* Block the main thread to prevent exit until the server has shutdown. */
+      server.waitTillShutdown()
     } else {
       /* Not running under SBT, or we are but under a forked JVM. In either
          case we ensure shutdown but registering our shutdown procedure as a
@@ -39,10 +41,9 @@ trait Runner {
       sys.addShutdownHook {
         doShutdownServer()
         doShutdownService()
+        server.waitTillShutdown()        
       }
     }
 
-    /* Block the main thread to prevent exit until the server has shutdown. */
-    server.waitTillShutdown()
   }
 }
