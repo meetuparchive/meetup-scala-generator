@@ -36,10 +36,6 @@ public final class TestScalaCodegen {
         return new AdHoc("test-meetup-scala-" + tag.name(), tag);
     }
 
-    public static BaseScalaCodegen getClient() {
-        return get(CodegenType.CLIENT);
-    }
-
     public static BaseScalaCodegen getServer() {
         return get(CodegenType.SERVER);
     }

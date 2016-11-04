@@ -9,7 +9,7 @@ import scala.collection.JavaConverters._
 
 class ModelEnumTest extends FunSpec with Matchers {
 
-  val codeGen = TestScalaCodegen.getClient
+  val codeGen = TestScalaCodegen.getServer
 
   val generatedModel = {
 

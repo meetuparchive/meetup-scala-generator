@@ -6,7 +6,7 @@ import org.scalatest.{FunSpec, Matchers}
 
 class ModelEnumNamingTest extends FunSpec with Matchers {
 
-  val codeGen = TestScalaCodegen.getClient
+  val codeGen = TestScalaCodegen.getServer
 
   describe("toEnumName") {
     it("should capitalize the name") {
