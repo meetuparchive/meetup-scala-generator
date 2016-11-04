@@ -6,9 +6,7 @@ import java.util.*;
 
 public class ScalaServerCodegen extends BaseScalaCodegen {
 
-    public CodegenType getTag() {
-        return CodegenType.SERVER;
-    }
+    public CodegenType getTag() { return CodegenType.SERVER; }
 
     public String getName() {
         return "meetup-scala-server";

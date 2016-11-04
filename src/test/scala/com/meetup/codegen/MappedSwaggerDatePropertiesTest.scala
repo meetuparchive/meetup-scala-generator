@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 
 class MappedSwaggerDatePropertiesTest extends FunSpec with Matchers {
 
-  val codeGen = new ScalaServerCodegen()
+  val codeGen = TestScalaCodegen.getServer
 
   val swaggerMappedTypes =
     Map[String, (String, String => AbstractProperty)](

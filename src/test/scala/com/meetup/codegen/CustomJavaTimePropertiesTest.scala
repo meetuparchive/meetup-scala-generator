@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 
 class CustomJavaTimePropertiesTest extends FunSpec with Matchers {
 
-  val codeGen = new ScalaServerCodegen()
+  val codeGen = TestScalaCodegen.getServer
 
   val customMappedTypes =
     Map(
@@ -23,7 +23,7 @@ class CustomJavaTimePropertiesTest extends FunSpec with Matchers {
       }
     }
 
-    it("should not be mapped from any other property type than string") {
+    it("should not be mapped from any property type other than string") {
       val props: List[String => Property] =
         mkProp(new BinaryProperty) ::
           mkProp(new BooleanProperty) ::

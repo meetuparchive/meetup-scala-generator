@@ -11,15 +11,18 @@ import java.io.File;
 import java.util.*;
 
 /**
- * A base code generator for scala source. Currently this plays two roles:
- * 1) providing some base settings
+ * A base code generator for scala source. Currently this plays a few roles:
+ * 1) provide some default settings like source folder, package, etc
+ * 2) provide some general scala constraints including reserved words and primitives
+ * 3) opinionated handling of how a spec should be interpreted as scala
+ *    (enums, optional properties, etc) as well as support for JSON codec generation
  */
 abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig {
 
     private static final String ARG_INCLUDE_SERIALIZATION = "includeSerialization";
 
-    protected String sourceFolder = "src/main/scala";
-    protected String invokerPackage = "io.swagger";
+    private String sourceFolder = "src/main/scala";
+    private String invokerPackage = "io.swagger";
     protected String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
 
     private static final Set<String> NUMBER_TYPES =
@@ -99,13 +102,6 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     public void processOpts() {
         // TODO
         super.processOpts();
-//        invokerPackage =
-//                additionalProperties.get(Arg.ARTIFACT_ORGANIZATION.argument).toString() +
-//                        "." + additionalProperties.get(Arg.ARTIFACT_NAME.argument).toString();
-//        invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
-//
-//        modelPackage = invokerPackage + ".api.model";
-//        apiPackage = invokerPackage + ".api.api";
         additionalProperties.put(CodegenConstants.INVOKER_PACKAGE, invokerPackage);
 
         final boolean includeSerialization = Boolean.TRUE.toString().equals(additionalProperties.get(ARG_INCLUDE_SERIALIZATION));
@@ -123,7 +119,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     }
 
     @Override
-    public Map<String, Object> postProcessModels(Map<String, Object> objs) {
+    public final Map<String, Object> postProcessModels(Map<String, Object> objs) {
         // import sanitization lifted from ScalaClientCodegen
         @SuppressWarnings("unchecked")
         List<Map<String, String>> imports = (List<Map<String, String>>) objs.get("imports");
@@ -145,7 +141,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
      * @return the escaped term
      */
     @Override
-    public String escapeReservedWord(String name) {
+    public final String escapeReservedWord(String name) {
         return "`" + name + "`";
     }
 
@@ -153,7 +149,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
      * Location to write model files.  You can use the modelPackage() as defined when the class is
      * instantiated
      */
-    public String modelFileFolder() {
+    public final String modelFileFolder() {
         return outputFolder + "/" + sourceFolder + "/" + modelPackage().replace('.', File.separatorChar);
     }
 
@@ -162,7 +158,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
      * instantiated
      */
     @Override
-    public String apiFileFolder() {
+    public final String apiFileFolder() {
         return outputFolder + "/" + sourceFolder + "/" + apiPackage().replace('.', File.separatorChar);
     }
 
@@ -173,7 +169,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
      * @return a string value used as the `dataType` field for model templates, `returnType` for api templates
      */
     @Override
-    public String getTypeDeclaration(Property p) {
+    public final String getTypeDeclaration(Property p) {
         String type;
         if (p instanceof ArrayProperty) {
             ArrayProperty ap = (ArrayProperty) p;
@@ -197,7 +193,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
      * @see io.swagger.models.properties.Property
      */
     @Override
-    public String getSwaggerType(Property p) {
+    public final String getSwaggerType(Property p) {
         String swaggerType;
 
         Set<String> types = new HashSet<>();
@@ -227,12 +223,12 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     }
 
     @Override
-    public String toEnumName(CodegenProperty property) {
+    public final String toEnumName(CodegenProperty property) {
         return camelize(property.name.split("_"));
     }
 
     @Override
-    public String toEnumVarName(String value, String datatype) {
+    public final String toEnumVarName(String value, String datatype) {
         if (NUMBER_TYPES.contains(datatype)) {
             return "Number" + value;
         } else {
@@ -241,7 +237,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     }
 
     @Override
-    public String toEnumValue(String value, String datatype) {
+    public final String toEnumValue(String value, String datatype) {
         if (NUMBER_TYPES.contains(datatype)) {
             return value;
         } else {
