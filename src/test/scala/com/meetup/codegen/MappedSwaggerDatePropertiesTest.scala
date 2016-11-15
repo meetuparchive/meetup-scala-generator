@@ -5,12 +5,12 @@ import org.scalatest.{FunSpec, Matchers}
 
 class MappedSwaggerDatePropertiesTest extends FunSpec with Matchers {
 
-  val codeGen = new ScalaServerCodegen()
+  val codeGen = TestScalaCodegen.getServer
 
   val swaggerMappedTypes =
     Map[String, (String, String => AbstractProperty)](
-      "date" -> ("LocalDate", mkProp(new DateProperty)),
-      "date-time" -> ("ZonedDateTime", mkProp(new DateTimeProperty))
+      ("date", ("LocalDate", mkProp(new DateProperty))),
+      ("date-time", ("ZonedDateTime", mkProp(new DateTimeProperty)))
     )
 
   describe("a swagger date/time property") {
