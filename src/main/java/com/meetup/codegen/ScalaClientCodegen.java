@@ -32,13 +32,4 @@ public class ScalaClientCodegen extends BaseScalaCodegen {
 
     }
 
-    @Override
-    public void processOpts() {
-        super.processOpts();
-
-        supportingFiles.add(new SupportingFile("build.sbt.mustache", "build.sbt"));
-        supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
-        supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
-    }
-
 }
