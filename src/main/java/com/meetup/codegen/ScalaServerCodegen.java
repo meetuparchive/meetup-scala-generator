@@ -6,8 +6,6 @@ import java.util.*;
 
 public class ScalaServerCodegen extends BaseScalaCodegen {
 
-    protected String invokerPackage = "com.meetup.server";
-
     public CodegenType getTag() { return CodegenType.SERVER; }
 
     public String getName() {
@@ -16,6 +14,8 @@ public class ScalaServerCodegen extends BaseScalaCodegen {
 
     public ScalaServerCodegen() {
         super();
+
+        invokerPackage = "com.meetup.server";
 
         modelTemplateFiles.put(
                 "model.mustache", // the template to use
