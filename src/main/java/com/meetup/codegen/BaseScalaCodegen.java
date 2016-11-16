@@ -20,9 +20,8 @@ import java.util.*;
 abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig {
 
     private static final String ARG_INCLUDE_SERIALIZATION = "includeSerialization";
-
-    private String sourceFolder = "src/main/scala";
-    private String invokerPackage = "io.swagger";
+    protected String sourceFolder = "src/main/scala";
+    protected String invokerPackage = "com.meetup";
     protected String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
 
     private static final Set<String> NUMBER_TYPES =
@@ -104,7 +103,13 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
         super.processOpts();
         additionalProperties.put(CodegenConstants.INVOKER_PACKAGE, invokerPackage);
 
-        final boolean includeSerialization = Boolean.TRUE.toString().equals(additionalProperties.get(ARG_INCLUDE_SERIALIZATION));
+        modelPackage = invokerPackage + ".api.model";
+        apiPackage = invokerPackage + ".api.api";
+
+        String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
+
+        Object incSer = additionalProperties.get(ARG_INCLUDE_SERIALIZATION);
+        final boolean includeSerialization = incSer == null || Boolean.TRUE.toString().equals(incSer);
         additionalProperties.put(ARG_INCLUDE_SERIALIZATION, includeSerialization);
 
         if (includeSerialization) {

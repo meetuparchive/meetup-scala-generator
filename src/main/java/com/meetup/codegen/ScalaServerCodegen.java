@@ -6,6 +6,8 @@ import java.util.*;
 
 public class ScalaServerCodegen extends BaseScalaCodegen {
 
+    protected String invokerPackage = "com.meetup.server";
+
     public CodegenType getTag() { return CodegenType.SERVER; }
 
     public String getName() {

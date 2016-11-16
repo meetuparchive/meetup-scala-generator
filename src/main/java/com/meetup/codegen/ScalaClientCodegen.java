@@ -5,6 +5,8 @@ import io.swagger.codegen.SupportingFile;
 
 public class ScalaClientCodegen extends BaseScalaCodegen {
 
+    protected String invokerPackage = "com.meetup.client";
+
     public CodegenType getTag() { return CodegenType.CLIENT; }
 
     public String getName() {
