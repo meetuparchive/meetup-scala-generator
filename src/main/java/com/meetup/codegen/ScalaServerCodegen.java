@@ -15,6 +15,8 @@ public class ScalaServerCodegen extends BaseScalaCodegen {
     public ScalaServerCodegen() {
         super();
 
+        invokerPackage = "com.meetup.server";
+
         modelTemplateFiles.put(
                 "model.mustache", // the template to use
                 ".scala");        // the extension for each file to write

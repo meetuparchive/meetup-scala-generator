@@ -8,7 +8,7 @@ CI_WORKDIR ?= $(shell pwd)
 
 TARGET ?= __package-sbt
 
-VERSION ?= 0.2.$(CI_BUILD_NUMBER)
+VERSION ?= 0.3.$(CI_BUILD_NUMBER)
 
 BUILDER_TAG = "meetup/sbt-builder:0.1.5"
 

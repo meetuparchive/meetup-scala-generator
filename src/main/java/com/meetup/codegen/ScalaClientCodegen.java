@@ -14,6 +14,8 @@ public class ScalaClientCodegen extends BaseScalaCodegen {
     public ScalaClientCodegen() {
         super();
 
+        invokerPackage = "com.meetup.client";
+
         // set the output folder here
         outputFolder = "generated-code/" + getName();
 
