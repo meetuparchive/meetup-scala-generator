@@ -5,8 +5,6 @@ import io.swagger.codegen.SupportingFile;
 
 public class ScalaClientCodegen extends BaseScalaCodegen {
 
-    protected String invokerPackage = "com.meetup.client";
-
     public CodegenType getTag() { return CodegenType.CLIENT; }
 
     public String getName() {
@@ -15,6 +13,8 @@ public class ScalaClientCodegen extends BaseScalaCodegen {
 
     public ScalaClientCodegen() {
         super();
+
+        invokerPackage = "com.meetup.client";
 
         // set the output folder here
         outputFolder = "generated-code/" + getName();
