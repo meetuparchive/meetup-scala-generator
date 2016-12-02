@@ -106,11 +106,11 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
         modelPackage = invokerPackage + ".api.model";
         apiPackage = invokerPackage + ".api.api";
 
-        String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
+        invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
 
         Object incSer = additionalProperties.get(ARG_INCLUDE_SERIALIZATION);
         final boolean includeSerialization = incSer == null || Boolean.TRUE.toString().equals(incSer);
-        additionalProperties.put(ARG_INCLUDE_SERIALIZATION, includeSerialization);
+        additionalProperties.put(ARG_INCLUDE_SERIALIZATION, includeSerialization); //
 
         if (includeSerialization) {
             supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
