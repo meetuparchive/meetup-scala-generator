@@ -3,7 +3,19 @@
 SBT=sbt
 CODEGEN=swagger-codegen/swagger-codegen
 
-echo "[ Generator test ]"
+GEN_ARG=$1
+GEN_NAME=$1
+
+if [ "$GEN_ARG" = "server" ]; then
+  GEN_NAME=meetup-scala-server
+elif [ "$GEN_ARG" = "client" ]; then
+  GEN_NAME=meetup-scala-client
+else
+  echo "Please specify 'server' or 'client'!"
+  exit 1
+fi
+
+echo "[ $GEN_NAME generator test ]"
 
 # Use SBT to build the package and print the target directory, name, and version.
 # Disable log formatting and grab the last three lines, which will consist of the above
@@ -25,16 +37,19 @@ done
 # The complete artifact path.
 A_PATH=$A_DIR/$A_NAME-$A_VERSION.jar
 
-GEN_DIR=generated-client
+GEN_DIR=generated-$GEN_ARG
 
 echo "  -> Running the code generator ..."
-export CP=$A_PATH && $CODEGEN generate -i swagger.yaml -l meetup-scala-client -o $GEN_DIR > /dev/null 2>&1
+export CP=$A_PATH && $CODEGEN generate -i swagger.yaml -l $GEN_NAME -o $GEN_DIR > /dev/null 2>&1
 
 
 # Currently client generation does not produce a project, as its intended to output source
 # within an existing code base. Thus we provide one here so we can test the generated code
 # via compilation.
-echo 'libraryDependencies ++= Seq("org.json4s" %% "json4s-native" % "3.4.0", "com.squareup.okhttp3" % "okhttp" % "3.5.0")' > $GEN_DIR/build.sbt
+
+if [ "$GEN_ARG" = "client" ]; then
+  echo 'libraryDependencies ++= Seq("org.json4s" %% "json4s-native" % "3.4.0", "com.squareup.okhttp3" % "okhttp" % "3.5.0")' > $GEN_DIR/build.sbt
+fi
 
 echo "  -> Attempting to build the generated code ..."
 pushd $GEN_DIR > /dev/null

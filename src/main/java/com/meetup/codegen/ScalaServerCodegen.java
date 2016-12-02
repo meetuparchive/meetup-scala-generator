@@ -29,10 +29,6 @@ public class ScalaServerCodegen extends BaseScalaCodegen {
         apiTemplateFiles.put(
                 "server/apiRouter.mustache",   // the template to use
                 "Router.scala");       // the extension for each file to write
-
-        apiTemplateFiles.put(
-                "api.mustache",   // the template to use
-                ".scala");        // the extension for each file to write
     }
 
     @Override
