@@ -1,5 +1,12 @@
 [![Build Status](https://travis-ci.com/meetup/meetup-scala-generator.svg?token=FbswwsCsDvuHxrWDF4fU&branch=SGT-25_travis_config)](https://travis-ci.com/meetup/meetup-scala-generator)
 
+## Development
+
+The `test.sh` and `watch-test.sh` scripts have been added to the project root to support integration tests of the
+generators. `test.sh` will run either generator based on the command line argument (either `client` or `server`).
+`watch-test.sh` receives the same argument and will continuously run `test.sh` when a file under `src` changes.
+Note this requires [fswatch](https://github.com/emcrisostomo/fswatch) to be installed.
+
 ## Running the Code Generator
 
 Clone this repository, `cd` to the resulting project directory, and then build
@@ -15,6 +22,16 @@ code generation:
 
 ### Generate a client
 `CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-client -o generated`
+
+Once you have generated a client you can forward requests to a cloud-hosted service. First get the pod name:
+
+`kubectl get pod --namespace orgx`
+
+Assuming we get a pod name of `plan-service-896393671-ea03g`, start up the forwarder:
+
+`kubectl port-forward plan-service-896393671-ea03g --namespace orgx 9000`
+
+Be careful! Currently this is "production".
 
 ### Generate a server
 `CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-server -o generated`

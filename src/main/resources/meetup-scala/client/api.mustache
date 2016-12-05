@@ -1,0 +1,23 @@
+package {{package}}
+{{#operations}}
+{{#imports}}import {{import}}
+{{/imports}}
+
+import {{invokerPackage}}.{ApiInvoker, Codec}
+import scala.concurrent.Future
+
+final class {{classname}}(basePath: String, invoker: ApiInvoker) {
+
+{{#operation}}
+  def {{operationId}}({{#allParams}}{{paramName}}: {{dataType}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): Future[{{returnType}}] = {
+    val path = "{{{path}}}"{{#pathParams}}.replaceAll("\\{" + "{{baseName}}" + "\\}", {{paramName}}.toString){{/pathParams}}
+    invoker.invokeGet[{{returnType}}](basePath, path, Map())
+  }
+{{/operation}}
+}
+{{/operations}}
+
+object {{classname}} {
+  def get(basePath: String = "{{basePath}}", invoker: ApiInvoker = ApiInvoker.defaultApiInvoker): {{classname}} =
+    new {{classname}}(basePath, invoker)
+}

@@ -36,6 +36,7 @@ paths:
 
   /subscriptions/{id}/{secondId}:
     get:
+      operationId: getSubscriptionByIds
       tags:
         - subscription
       description: Fetch an existing subscription.

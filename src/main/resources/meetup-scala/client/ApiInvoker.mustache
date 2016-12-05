@@ -1,0 +1,58 @@
+package {{invokerPackage}}
+
+import java.io.IOException
+import java.net.URI
+import okhttp3._
+import scala.concurrent.Future
+
+final class ApiInvoker private (okHttp: OkHttpClient) {
+
+  def invokeGet[A : Codec](baseUrl: String, path: String, queryParams: Map[String, String]): Future[A] = {
+
+    val promise = scala.concurrent.Promise[A]()
+
+    val uri = new URI(baseUrl)
+    val finalPath = uri.getPath + (if(path.startsWith("/")) path.drop(1) else path)
+    val builder = new HttpUrl.Builder()
+      .host(uri.getHost)
+      .port(uri.getPort)
+      .scheme(uri.getScheme)
+      .addPathSegments(finalPath)
+
+    val url =
+      queryParams
+        .foldLeft(builder) {
+          case (acc, (name, value)) => acc.addQueryParameter(name, value)
+        }
+      .build()
+
+    val req = new Request.Builder()
+      .get()
+      .url(url)
+      .build()
+
+    okHttp.newCall(req).enqueue(new Callback {
+      override def onFailure(call: Call, e: IOException): Unit =
+        promise.failure(e)
+
+      override def onResponse(call: Call, response: Response): Unit =
+        Serializer.deserialize(response.body().string()) match {
+          case Left(e) => promise.failure(new RuntimeException(e)) // TODO
+          case Right(a) => promise.success(a)
+        }
+    })
+
+    promise.future
+  }
+}
+
+object ApiInvoker {
+  val defaultOkkHttp: OkHttpClient = new OkHttpClient.Builder()
+    //.dispatcher() // TODO configure executor service, thread pool, etc
+    .build()
+
+  val defaultApiInvoker: ApiInvoker = get(defaultOkkHttp)
+
+  def get(okHttp: OkHttpClient = defaultOkkHttp): ApiInvoker =
+    new ApiInvoker(defaultOkkHttp)
+}
