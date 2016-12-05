@@ -9,13 +9,15 @@ final class ApiInvoker private (okHttp: OkHttpClient) {
 
   def invokeGet[A : Codec](baseUrl: String, path: String, queryParams: Map[String, String]): Future[A] = {
 
-    val p = scala.concurrent.Promise[A]()
+    val promise = scala.concurrent.Promise[A]()
 
     val uri = new URI(baseUrl)
+    val finalPath = uri.getPath + (if(path.startsWith("/")) path.drop(1) else path)
     val builder = new HttpUrl.Builder()
       .host(uri.getHost)
+      .port(uri.getPort)
       .scheme(uri.getScheme)
-      .addPathSegments(uri.getPath + path)
+      .addPathSegments(finalPath)
 
     val url =
       queryParams
@@ -23,7 +25,6 @@ final class ApiInvoker private (okHttp: OkHttpClient) {
           case (acc, (name, value)) => acc.addQueryParameter(name, value)
         }
       .build()
-    println(url)
 
     val req = new Request.Builder()
       .get()
@@ -32,16 +33,16 @@ final class ApiInvoker private (okHttp: OkHttpClient) {
 
     okHttp.newCall(req).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit =
-        p.failure(e)
+        promise.failure(e)
 
       override def onResponse(call: Call, response: Response): Unit =
         Serializer.deserialize(response.body().string()) match {
-          case Left(e) => p.failure(new RuntimeException(e)) // TODO
-          case Right(a) => p.success(a)
+          case Left(e) => promise.failure(new RuntimeException(e)) // TODO
+          case Right(a) => promise.success(a)
         }
     })
 
-    p.future
+    promise.future
   }
 }
 

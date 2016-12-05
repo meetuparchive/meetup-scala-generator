@@ -23,6 +23,16 @@ code generation:
 ### Generate a client
 `CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-client -o generated`
 
+Once you have generated a client you can forward requests to a cloud-hosted service. First get the pod name:
+
+`kubectl get pod --namespace orgx`
+
+Assuming we get a pod name of `plan-service-896393671-ea03g`, start up the forwarder:
+
+`kubectl port-forward plan-service-896393671-ea03g --namespace orgx 9000`
+
+Be careful! Currently this is "production".
+
 ### Generate a server
 `CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-server -o generated`
 
