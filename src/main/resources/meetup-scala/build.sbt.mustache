@@ -9,4 +9,7 @@ initialCommands := "import {{invokerPackage}}._; import {{apiPackage}}._; import
 
 // TODO this depends on JSON lib selection, but if we support other libs this
 // can be modified.
-libraryDependencies += "org.json4s" %% "json4s-native" % "3.4.0"
+libraryDependencies ++= Seq(
+  "org.json4s" %% "json4s-native" % "3.4.0",
+  "com.meetup" %% "json4s-java-time" % "0.0.6"
+)

@@ -1,9 +1,10 @@
 import org.json4s._
 import org.json4s.native.Serialization
+import com.meetup.json4s.JavaTimeSerializers
+
+implicit val formats = Serialization.formats(NoTypeHints) ++ JavaTimeSerializers.defaults
   
 implicit val {{classname}}Codec = new Codec[{{classname}}] {
-  implicit val formats = Serialization.formats(NoTypeHints)
-
   def encode(a: {{classname}}): JValue = Extraction.decompose(a)
 
   def decode(j: JValue): Either[String, {{classname}}] =
@@ -15,8 +16,6 @@ implicit val {{classname}}Codec = new Codec[{{classname}}] {
 }
 
 implicit val {{classname}}ListCodec = new Codec[List[{{classname}}]] {
-  implicit val formats = Serialization.formats(NoTypeHints)
-
   def encode(a: List[{{classname}}]): JValue = Extraction.decompose(a)
 
   def decode(j: JValue): Either[String, List[{{classname}}]] =

@@ -48,7 +48,9 @@ export CP=$A_PATH && $CODEGEN generate -i swagger.yaml -l $GEN_NAME -o $GEN_DIR 
 # via compilation.
 
 if [ "$GEN_ARG" = "client" ]; then
-  echo 'libraryDependencies ++= Seq("org.json4s" %% "json4s-native" % "3.4.0", "com.squareup.okhttp3" % "okhttp" % "3.5.0")' > $GEN_DIR/build.sbt
+  echo 'scalaVersion := "2.11.8"
+  
+  libraryDependencies ++= Seq("org.json4s" %% "json4s-native" % "3.4.0", "com.squareup.okhttp3" % "okhttp" % "3.5.0", "com.meetup" %% "json4s-java-time" % "0.0.6")' > $GEN_DIR/build.sbt  
 fi
 
 echo "  -> Attempting to build the generated code ..."
