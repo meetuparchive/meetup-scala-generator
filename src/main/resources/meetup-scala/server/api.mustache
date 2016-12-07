@@ -1,0 +1,12 @@
+package {{package}}
+{{#operations}}
+    {{#imports}}import {{import}}
+    {{/imports}}
+
+    trait {{classname}} {
+
+    {{#operation}}
+        def {{operationId}}({{#allParams}}{{paramName}}: {{dataType}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}
+    {{/operation}}
+    }
+{{/operations}}
