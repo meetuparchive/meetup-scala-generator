@@ -5,6 +5,7 @@ CODEGEN=swagger-codegen/swagger-codegen
 
 GEN_ARG=$1
 GEN_NAME=$1
+SWAGGER_SPEC=$2
 
 if [ "$GEN_ARG" = "server" ]; then
   GEN_NAME=meetup-scala-server
@@ -13,6 +14,10 @@ elif [ "$GEN_ARG" = "client" ]; then
 else
   echo "Please specify 'server' or 'client'!"
   exit 1
+fi
+
+if [ -z $SWAGGER_SPEC ]; then
+  SWAGGER_SPEC=swagger.yaml
 fi
 
 echo "[ $GEN_NAME generator test ]"
@@ -40,7 +45,7 @@ A_PATH=$A_DIR/$A_NAME-$A_VERSION.jar
 GEN_DIR=generated-$GEN_ARG
 
 echo "  -> Running the code generator ..."
-export CP=$A_PATH && $CODEGEN generate -i swagger.yaml -l $GEN_NAME -o $GEN_DIR > /dev/null 2>&1
+export CP=$A_PATH && $CODEGEN generate -i $SWAGGER_SPEC -l $GEN_NAME -o $GEN_DIR > /dev/null 2>&1
 
 
 # Currently client generation does not produce a project, as its intended to output source
