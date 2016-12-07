@@ -21,7 +21,7 @@ This will have produced a jar of the generator, which we can now use for
 code generation:
 
 ### Generate a client
-`CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-client -o generated`
+```CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-client -o generated```
 
 Once you have generated a client you can forward requests to a cloud-hosted service. First get the pod name:
 
