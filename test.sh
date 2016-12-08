@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Build the generator package, run then named generator (client|server), and
+# attempt to build the generated sources.
+
 SBT=sbt
 CODEGEN=swagger-codegen/swagger-codegen
 

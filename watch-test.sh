@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Allow continuous testing for generator development. When a source file
+# changes the generator package is rebuilt, the given generator used to
+# generate source, and then those sources are built and reported on.
+
 # Killing 0 sends the signal to all processes in the current process group.
 # Without this you must wrestle with ctrl+c to get at this process and
 # those it spawns.

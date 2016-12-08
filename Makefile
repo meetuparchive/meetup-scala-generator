@@ -25,7 +25,7 @@ list:
 # required for list
 no_op__:
 
-__package-sbt:
+__package-sbt: integration-test
 	sbt clean \
 	test \
 	publishLocal \
@@ -49,6 +49,9 @@ __contained-target:
 		-e TRAVIS_PULL_REQUEST=$(TRAVIS_PULL_REQUEST) \
 		$(BUILDER_TAG) \
 		make $(TARGET)
+
+integration-test:
+	@./test-all.sh
 
 package: __contained-target
 
