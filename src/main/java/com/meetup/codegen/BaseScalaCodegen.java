@@ -86,6 +86,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
         typeMapping.put("DateTime", "ZonedDateTime");
 
         typeMapping.put("int", "Int");
+        typeMapping.put("Integer", "Int");
 
         typeMapping.put("timestamp", "Instant");
         importMapping.put("Instant", "java.time.Instant");
