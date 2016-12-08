@@ -21,9 +21,11 @@ libraryDependencies ++=
       exclude("com.netflix.archaius", "archaius-core"), // TODO make sure this is safe
     "io.reactivex" % "rxnetty" % "0.4.16",
     "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0",
-    "com.meetup" %% "scala-logger" % "10.0.0",
+    "com.meetup" %% "scala-logger" % "0.1.9",
     "io.reactivex" % "rxnetty" % "0.4.16"
   )
+
+resolvers += "Meetup Bintray" at "https://dl.bintray.com/meetup/maven/"
 
 buildInfoKeys := Seq[BuildInfoKey](name, organization, version, scalaVersion, sbtVersion)
 
