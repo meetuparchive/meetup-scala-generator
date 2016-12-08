@@ -10,4 +10,4 @@ if [ "$1" != "server" -a "$1" != "client" ]; then
   exit 1
 fi
 
-while [ 1 ]; do fswatch -o src/ | `pwd`/test.sh $1; done
+while [ 1 ]; do fswatch -o src/ | `pwd`/test.sh "$@"; done
