@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Test both the client and server generators regardless if one fails. If either
+# fails, exit with that exit code.
+
 ./test.sh client
 R_CLIENT=$?
 
