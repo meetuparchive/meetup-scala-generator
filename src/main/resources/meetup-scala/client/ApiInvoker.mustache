@@ -6,18 +6,61 @@ import okhttp3._
 import scala.concurrent.Future
 
 final class ApiInvoker private (okHttp: OkHttpClient) {
+  import ApiInvoker.{getRequestBuilder, JsonMediaType}
 
-  def invokeGet[A : Codec](baseUrl: String, path: String, queryParams: Map[String, String]): Future[A] = {
+  def invokePOST[A : Codec, B : Codec](baseUrl: String, path: String, queryParams: Map[String, String], body: Option[A] = None): Future[B] = {
+    val reqBuilder = getRequestBuilder(baseUrl, path, queryParams)
 
+    val serializedBody: Option[String] = body.map(Serializer.serialize[A])
+    val req = serializedBody
+      .map(jsonStr => reqBuilder.post(RequestBody.create(JsonMediaType, jsonStr)))
+      .getOrElse(reqBuilder)
+      .build()
+
+    dispatchRequest[B](req)
+  }
+
+  def invokeGET[A : Codec](baseUrl: String, path: String, queryParams: Map[String, String]): Future[A] = {
+    val req = getRequestBuilder(baseUrl, path, queryParams)
+      .get()
+      .build()
+    dispatchRequest[A](req)
+  }
+
+  private def dispatchRequest[A : Codec](req: Request): Future[A] = {
     val promise = scala.concurrent.Promise[A]()
+    okHttp.newCall(req).enqueue(new Callback {
+      override def onFailure(call: Call, e: IOException): Unit =
+        promise.failure(e)
 
+      override def onResponse(call: Call, response: Response): Unit = {
+        println(response.body().string())
+        Serializer.deserialize[A](response.body().string()) match {
+          case Left(e) => promise.failure(new RuntimeException(e)) // TODO
+          case Right(a) => promise.success(a)
+        }}
+      })
+    promise.future
+  }
+}
+
+object ApiInvoker {
+  val JsonMediaType = MediaType.parse("application/json; charset=utf-8")
+
+  val defaultOkkHttp: OkHttpClient = new OkHttpClient.Builder()
+    //.dispatcher() // TODO configure executor service, thread pool, etc
+    .build()
+
+  val defaultApiInvoker: ApiInvoker = get(defaultOkkHttp)
+
+  def getRequestBuilder(baseUrl: String, path: String, queryParams: Map[String, String]): Request.Builder = {
     val uri = new URI(baseUrl)
     val finalPath = uri.getPath + (if(path.startsWith("/")) path.drop(1) else path)
     val builder = new HttpUrl.Builder()
       .host(uri.getHost)
       .port(uri.getPort)
-      .scheme(uri.getScheme)
-      .addPathSegments(finalPath)
+       .scheme(uri.getScheme)
+       .addPathSegments(finalPath)
 
     val url =
       queryParams
@@ -26,32 +69,8 @@ final class ApiInvoker private (okHttp: OkHttpClient) {
         }
       .build()
 
-    val req = new Request.Builder()
-      .get()
-      .url(url)
-      .build()
-
-    okHttp.newCall(req).enqueue(new Callback {
-      override def onFailure(call: Call, e: IOException): Unit =
-        promise.failure(e)
-
-      override def onResponse(call: Call, response: Response): Unit =
-        Serializer.deserialize(response.body().string()) match {
-          case Left(e) => promise.failure(new RuntimeException(e)) // TODO
-          case Right(a) => promise.success(a)
-        }
-    })
-
-    promise.future
+    new Request.Builder().url(url)
   }
-}
-
-object ApiInvoker {
-  val defaultOkkHttp: OkHttpClient = new OkHttpClient.Builder()
-    //.dispatcher() // TODO configure executor service, thread pool, etc
-    .build()
-
-  val defaultApiInvoker: ApiInvoker = get(defaultOkkHttp)
 
   def get(okHttp: OkHttpClient = defaultOkkHttp): ApiInvoker =
     new ApiInvoker(defaultOkkHttp)
