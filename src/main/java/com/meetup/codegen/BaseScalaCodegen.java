@@ -117,6 +117,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
             supportingFiles.add(new SupportingFile("Codec.mustache", invokerFolder, "Codec.scala"));
             supportingFiles.add(new SupportingFile("Serializer.mustache", invokerFolder, "Serializer.scala"));
             supportingFiles.add(new SupportingFile("parserJson4s.mustache", invokerFolder, "Parser.scala"));
+            supportingFiles.add(new SupportingFile("codecInstancesJson4s.mustache", invokerFolder, "CodecInstances.scala"));
 
             additionalProperties.put("json4s", "true");
             additionalProperties.put("jsonTypePackage", "org.json4s");

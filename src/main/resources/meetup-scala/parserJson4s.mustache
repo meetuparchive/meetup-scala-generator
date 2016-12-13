@@ -12,5 +12,9 @@ object Parser {
       case scala.util.control.NonFatal(e) => Left(e.getMessage)
     }
 
-  def deparse[A](j: JValue): String = compact(render(j))
+  def deparse[A](j: JValue): String =
+    j match {
+      case JNothing => ""
+      case _ => compact(render(j))
+    }
 }

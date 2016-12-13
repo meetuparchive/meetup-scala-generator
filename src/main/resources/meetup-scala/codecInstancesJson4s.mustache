@@ -1,0 +1,12 @@
+package {{invokerPackage}}
+
+import org.json4s._
+import org.json4s.native.Serialization
+
+trait CodecInstances {
+  implicit val UnitCodec =
+    new Codec[Unit] {
+      def encode(a: Unit): JValue = JNothing
+      def decode(j: JValue): Either[String, Unit] = Right(Unit)
+    }
+}
