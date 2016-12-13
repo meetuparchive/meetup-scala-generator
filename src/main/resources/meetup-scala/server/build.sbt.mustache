@@ -16,6 +16,7 @@ scalaVersion := "2.11.8"
 libraryDependencies ++=
   Seq(
     "org.json4s" %% "json4s-native" % "3.4.0",
+    "com.meetup" %% "json4s-java-time" % "0.0.6",
     "com.netflix.hystrix" % "hystrix-rx-netty-metrics-stream" % "1.4.23"
       exclude("io.reactivex", "rxnetty")
       exclude("com.netflix.archaius", "archaius-core"), // TODO make sure this is safe
