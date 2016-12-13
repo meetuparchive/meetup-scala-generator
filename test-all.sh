@@ -13,7 +13,7 @@ if [ $R_CLIENT -ne 0 ]; then
   exit $R_CLIENT
 fi
 
-if [ $R_SERVER -ne 0]; then
+if [ $R_SERVER -ne 0 ]; then
   exit $R_SERVER
 fi
 
