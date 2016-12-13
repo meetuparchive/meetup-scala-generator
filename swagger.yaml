@@ -11,6 +11,13 @@ tags:
 
 paths:
   /subscriptions:
+    delete:
+      tags:
+        - subscription
+      responses:
+        204:
+          description: An indication of successful deletion.
+
     post:
       tags:
         - subscription

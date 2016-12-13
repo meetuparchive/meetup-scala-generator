@@ -8,40 +8,51 @@ import scala.concurrent.Future
 final class ApiInvoker private (okHttp: OkHttpClient) {
   import ApiInvoker.{getRequestBuilder, JsonMediaType}
 
+  def invokeDELETE(baseUrl: String, path: String, queryParams: Map[String, String]): Future[Unit] = {
+    val req = getRequestBuilder(baseUrl, path, queryParams)
+      .delete()
+      .build()
+    dispatchRequest[Unit](req, { _ => Right(Unit) })
+  }
+
   def invokePOST[A : Codec, B : Codec](baseUrl: String, path: String, queryParams: Map[String, String], body: Option[A] = None): Future[B] = {
     val reqBuilder = getRequestBuilder(baseUrl, path, queryParams)
-
     val serializedBody: Option[String] = body.map(Serializer.serialize[A])
     val req = serializedBody
       .map(jsonStr => reqBuilder.post(RequestBody.create(JsonMediaType, jsonStr)))
       .getOrElse(reqBuilder)
       .build()
-
-    dispatchRequest[B](req)
+    dispatchCodecRequest[B](req)
   }
 
   def invokeGET[A : Codec](baseUrl: String, path: String, queryParams: Map[String, String]): Future[A] = {
     val req = getRequestBuilder(baseUrl, path, queryParams)
       .get()
       .build()
-    dispatchRequest[A](req)
+    dispatchCodecRequest[A](req)
   }
 
-  private def dispatchRequest[A : Codec](req: Request): Future[A] = {
+  private def dispatchRequest[A](req: Request, f: String => Either[Exception, A]): Future[A] = {
     val promise = scala.concurrent.Promise[A]()
     okHttp.newCall(req).enqueue(new Callback {
       override def onFailure(call: Call, e: IOException): Unit =
         promise.failure(e)
 
-      override def onResponse(call: Call, response: Response): Unit = {
-        println(response.body().string())
-        Serializer.deserialize[A](response.body().string()) match {
+      override def onResponse(call: Call, response: Response): Unit =
+        f(response.body().string()) match {
           case Left(e) => promise.failure(new RuntimeException(e)) // TODO
           case Right(a) => promise.success(a)
-        }}
+        }
       })
     promise.future
   }
+
+  private def dispatchCodecRequest[A : Codec](req: Request): Future[A] =
+    dispatchRequest(req, { s =>
+      Serializer.deserialize[A](s)
+        .left
+        .map(new RuntimeException(_))
+    })
 }
 
 object ApiInvoker {
