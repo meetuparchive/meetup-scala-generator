@@ -19,7 +19,7 @@ trait Codec[A] {
   def decode(j: {{jsonType}}): Either[String, A]
 }
 
-object Codec {
+object Codec extends CodecInstances {
   def encode[A](a: A)(implicit c: Codec[A]): {{jsonType}} = c.encode(a)
 
   def decode[A](j: {{jsonType}})(implicit c: Codec[A]): Either[String, A] =
