@@ -25,7 +25,7 @@ list:
 # required for list
 no_op__:
 
-__package-sbt: integration-test
+__package-sbt: component-test-generated
 	sbt clean \
 	test \
 	publishLocal \
@@ -50,7 +50,7 @@ __contained-target:
 		$(BUILDER_TAG) \
 		make $(TARGET)
 
-integration-test:
+component-test-generated:
 	@./test-all.sh
 
 package: __contained-target
