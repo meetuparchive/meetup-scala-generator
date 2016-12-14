@@ -100,12 +100,14 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
 
     @Override
     public void processOpts() {
-        // TODO
+        Object givenInvPkg = additionalProperties.get(CodegenConstants.INVOKER_PACKAGE);
+        invokerPackage = givenInvPkg == null ? invokerPackage : givenInvPkg.toString();
+
         super.processOpts();
         additionalProperties.put(CodegenConstants.INVOKER_PACKAGE, invokerPackage);
 
-        modelPackage = invokerPackage + ".api.model";
-        apiPackage = invokerPackage + ".api.api";
+        modelPackage = invokerPackage + ".model";
+        apiPackage = invokerPackage + ".api";
 
         invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
 
