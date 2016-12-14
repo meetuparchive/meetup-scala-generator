@@ -3,6 +3,7 @@ package {{invokerPackage}}
 import com.meetup.logging.Logging
 import io.netty.buffer.ByteBuf
 import io.reactivex.netty.protocol.http.server.{HttpServerRequest, HttpServerResponse, RequestHandler}
+import java.net.InetSocketAddress
 
 import scala.collection.JavaConverters._
 
@@ -22,7 +23,14 @@ class RequestLoggingHandler(handler: RequestHandler[ByteBuf, ByteBuf]) extends R
       .map(e => e.getKey + ": " + e.getValue)
       .mkString(System.lineSeparator)
 
+    val remoteAddress =
+      request.getNettyChannel.remoteAddress match {
+        case inet: InetSocketAddress => inet.getAddress.getHostAddress
+        case addr => s"unknown socket address type: $addr"
+      }
+
     s"""
+       |Request from $remoteAddress
        |${request.getHttpVersion} ${request.getHttpMethod} ${request.getUri}
        |$headers
      """.stripMargin
