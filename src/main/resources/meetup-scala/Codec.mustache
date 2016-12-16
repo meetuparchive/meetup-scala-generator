@@ -1,6 +1,7 @@
 package {{invokerPackage}}
 
 import {{jsonTypePackage}}.{{jsonType}}
+import org.json4s.Formats
 
 /**
   * A `Codec[A]` instance provides bidirectional JSON serialization support.
@@ -11,15 +12,22 @@ trait Codec[A] {
   /**
     * Encode an instance of `A` as an instance of `{{jsonType}}`.
     */
-  def encode(a: A): {{jsonType}}
+  def encode(a: A)(implicit formats: Formats): {{jsonType}}
 
   /**
    * Decode an instance of `{{jsonType}}` as an instance of `A`.
    */
-  def decode(j: {{jsonType}}): Either[String, A]
+  def decode(j: {{jsonType}})(implicit formats: Formats): Either[String, A]
 }
 
 object Codec extends CodecInstances {
+
+  import {{modelPackage}}._
+  import com.meetup.json4s.JavaTimeSerializers
+  import org.json4s.native.Serialization
+
+  implicit val formats = Serialization.formats(org.json4s.NoTypeHints) ++ JavaTimeSerializers.defaults{{#models}}{{#model}}{{#hasEnums}} + {{name}}.{{#vars}}{{#isEnum}}{{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}CustomSerializer{{/isEnum}}{{/vars}}{{/hasEnums}}{{/model}}{{/models}}
+
   def encode[A](a: A)(implicit c: Codec[A]): {{jsonType}} = c.encode(a)
 
   def decode[A](j: {{jsonType}})(implicit c: Codec[A]): Either[String, A] =
