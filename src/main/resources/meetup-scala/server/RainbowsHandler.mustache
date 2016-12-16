@@ -25,6 +25,7 @@ class RainbowsHandler(handler: RequestHandler[ByteBuf, ByteBuf]) extends Request
       val headers = response.getHeaders
       headers.set(HttpHeaderNames.CONTENT_LENGTH, messageBytes.length)
       headers.set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8")
+      headers.set(HttpHeaderNames.CONNECTION, "Keep-Alive")
       response.writeAndFlush(content)
     } else handler.handle(request, response)
 }

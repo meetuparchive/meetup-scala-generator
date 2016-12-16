@@ -68,6 +68,7 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
          val headers = response.getHeaders
          headers.set(HttpHeaderNames.CONTENT_LENGTH, message.length)
          headers.set(HttpHeaderNames.CONTENT_TYPE, "application/json")
+         headers.set(HttpHeaderNames.CONNECTION, "Keep-Alive")
          response.write(content)
          response.close(true)
      }
