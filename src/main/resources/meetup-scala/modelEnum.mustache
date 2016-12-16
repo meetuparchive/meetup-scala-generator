@@ -25,15 +25,14 @@ object {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{cla
   import org.json4s._
 
   implicit val {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}Codec = new Codec[{{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}] {
-    implicit val formats = org.json4s.DefaultFormats
 
-    def encode(a: {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}): JValue =
+    def encode(a: {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}})(implicit formats: Formats): JValue =
       a match {
         {{#allowableValues}}{{#enumVars}}case {{name}} => Extraction.decompose({{{value}}})
         {{/enumVars}}{{/allowableValues}}
       }
 
-    def decode(j: JValue): Either[String, {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}] =
+    def decode(j: JValue)(implicit formats: Formats): Either[String, {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}] =
       try {
         val raw = j.extract[{{#dataType}}{{.}}{{/dataType}}{{^dataType}}{{datatype}}{{/dataType}}]
         fromValue(raw).toRight(s"[$raw] does not map to a known [{{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}] enum instance!")

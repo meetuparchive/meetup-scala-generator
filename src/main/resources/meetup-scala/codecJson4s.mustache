@@ -1,13 +1,18 @@
 import org.json4s._
-import org.json4s.native.Serialization
-import com.meetup.json4s.JavaTimeSerializers
 
-implicit val formats = Serialization.formats(NoTypeHints) ++ JavaTimeSerializers.defaults
-  
+{{#hasEnums}}import org.json4s.CustomSerializer
+{{#vars}}{{#isEnum}}import org.json4s.JsonAST.J{{#dataType}}{{.}}{{/dataType}}{{^dataType}}{{datatype}}{{/dataType}}
+{{/isEnum}}{{/vars}}
+
+{{#vars}}{{#isEnum}}object {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}CustomSerializer extends CustomSerializer[{{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}](_ =>(
+  { case J{{#dataType}}{{.}}{{/dataType}}{{^dataType}}{{datatype}}{{/dataType}}(v) => {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}.fromValue(v).get },
+  { case e: {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}} => J{{#dataType}}{{.}}{{/dataType}}{{^dataType}}{{datatype}}{{/dataType}}(e.value) }
+)){{/isEnum}}{{/vars}}{{/hasEnums}}
+
 implicit val {{classname}}Codec = new Codec[{{classname}}] {
-  def encode(a: {{classname}}): JValue = Extraction.decompose(a)
+  def encode(a: {{classname}})(implicit formats: Formats): JValue = { println(s"{{classname}}Codec#encode") ; Extraction.decompose(a) }
 
-  def decode(j: JValue): Either[String, {{classname}}] =
+  def decode(j: JValue)(implicit formats: Formats): Either[String, {{classname}}] =
     try {
       Right(j.extract[{{classname}}])
     } catch {
@@ -16,9 +21,9 @@ implicit val {{classname}}Codec = new Codec[{{classname}}] {
 }
 
 implicit val {{classname}}ListCodec = new Codec[List[{{classname}}]] {
-  def encode(a: List[{{classname}}]): JValue = Extraction.decompose(a)
+  def encode(a: List[{{classname}}])(implicit formats: Formats): JValue = { println(s"{{classname}}ListCodec#encode") ; Extraction.decompose(a) }
 
-  def decode(j: JValue): Either[String, List[{{classname}}]] =
+  def decode(j: JValue)(implicit formats: Formats): Either[String, List[{{classname}}]] =
     try {
       Right(j.extract[List[{{classname}}]])
     } catch {
