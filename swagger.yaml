@@ -1,288 +1,407 @@
-swagger: "2.0"
+swagger: '2.0'
+
+host: "plan-service.orgx.mup-prod.mup.zone"
+
+schemes: [ http ]
 
 info:
   version: "0.0.0"
-  title: subscription service
+  title: Plans Service
 
-# Currently using this only because it results in the generator having a name
-# for the API client (results in SubscriptionApi as opposed to DefaultApi).
-tags:
-  - name: subscription
+# GET  /plans/:id -> Synonymous with GET /plans/country/:country/name/:plan_name, just with an explicit id
+# GET  /plans/name/:plan_name -> Gets a specific plan with no pricing info
+# GET  /plans/country/:country/psp/:psp -> Get all plans for the given country and PSP
+# GET  /plans/country/:country/name/:plan_name -> Gets a specific plan with country specific info
+
+# POST /plans -> creates a new plan, absent of pricing info
+# POST /plans/:id -> Synonymous with POST /plans/country/:country/name/:plan_name, just with an explicit id
+# POST /plans/name/:plan_name -> updates an existing plan, country specific info not allowed
+# POST /plans/name/:plan_name/entitlements -> updates entitlements for the given plan name
+# POST /plans/country/:country/name/:plan_name -> updates country specific info for the given plan_name
+
+# PUT  /plans/country/:country/name/:plan_name -> creates pricing and country specific info for the given plan_name (i.e. currency, amount)
 
 paths:
-  /subscriptions:
-    delete:
-      tags:
-        - subscription
-      responses:
-        204:
-          description: An indication of successful deletion.
-
+  /plans:
     post:
-      tags:
-        - subscription
-      description: Create a new subscription.
+      description: Create a new base plan (no country/pricing info)
       parameters:
         - name: body
-          required: true
           in: body
-          description: The parameters from which the subscription should be created.
+          required: true
           schema:
-            $ref: "#/definitions/SubscriptionParams"
+            $ref: "#/definitions/BasePlan"
+
       responses:
         201:
-          description: The Subscriber owning the newly created subscription.
+          description: Indication that plan creation succeeded
           schema:
-            $ref: "#/definitions/Subscriber"
+            $ref: "#/definitions/BasePlan"
         400:
-          description: A set of errors describing why the parameters did not result in a subscription.
+          description: Indication of a bad request
+        default:
+          description: Unexpected error
           schema:
-            type: array
-            items:
-              $ref: "#/definitions/Error"
+            $ref: "#/definitions/ServerError"
 
-  /subscriptions/{id}/{secondId}:
+  /plans/{id}:
     get:
-      operationId: getSubscriptionByIds
-      tags:
-        - subscription
-      description: Fetch an existing subscription.
+      description: Synonymous with GET /plans/country/:country/name/:plan_name, just with an explicit id
       parameters:
         - name: id
           in: path
-          type: integer
-          format: int64
+          description: unique id of a plan for a given country
           required: true
-          description: The subscription id.
-        - name: secondId
+          type: string
+      responses:
+        200: 
+          description: Successful response
+          schema:
+            $ref: "#/definitions/Plan"
+        404:
+          description: Indication that no plan with that id exists.
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/ServerError"
+    post:
+      description: Synonymous with POST /plans/country/:country/name/:plan_name, just with an explicit id
+      parameters:
+        - name: id
           in: path
-          type: integer
-          format: int64
+          description: unique id of a plan for a given country
           required: true
-          description: The secondary subscription id, as test
+          type: string
+
       responses:
         200:
-          description: The subscriber owning the subscription.
+          description: Successfully updated
           schema:
-            $ref: "#/definitions/Subscriber"
+            $ref: "#/definitions/Plan"
         404:
-          description: An indication that no subscription by that id exists.
+          description: Indication that no plan with that id exists
+        default:
+            description: Unexpected error
+            schema:
+              $ref: "#/definitions/ServerError"
+
+  /plans/name/{plan_name}:
+    get:
+      description: Get specificied base plan (no country specific info)
+      parameters:
+        - name: plan_name
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/BasePlan"
+        404:
+          description: Indication that there is no plan with that plan_name
+        default:
+            description: Unexpected error
+            schema:
+              $ref: "#/definitions/ServerError"
+    post:
+      description: Update the plan with the corresponding parameters
+      parameters:
+        - name: plan_name
+          in: path
+          description: unique name of a plan
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/PlanUpdateParams"
+
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/Plan"
+        400:
+          description: Indication that there was a problem with the request
+        404:
+          description: Indication that there is no plan with that plan_name
+        default:
+            description: Unexpected error
+            schema:
+              $ref: "#/definitions/ServerError"
+
+  /plans/name/{plan_name}/entitlements:
+    post:
+      description: Update the entitlements for a given plan
+      parameters: 
+        - name: plan_name
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/EntitlementUpdateParams"
+      responses:
+        200:
+          description: Successfully updated
+          schema:
+            $ref: "#/definitions/BasePlan"
+        400:
+          description: Indication that there was a problem with the request
+        404:
+          description: Indication that there is no plan with that plan_name
+        default:
+            description: Unexpected error
+            schema:
+              $ref: "#/definitions/ServerError"
+
+  /plans/country/{country}/name/{plan_name}:
+    get:
+      description: Get plan details including pricing, country, and PSP specific info
+      parameters:
+        - name: plan_name
+          in: path
+          description: unique name of a plan
+          required: true
+          type: string
+        - name: country
+          in: path
+          description: two letter country code 
+          required: true
+          type: string
+      responses:
+        200: 
+          description: Successful response
+          schema:
+            $ref: "#/definitions/Plan"
+        404:
+          description: Indication that no plan with that plan_name exists. Any country that is not specificallly supported will be defaulted to standard i18n plans.
+        default:
+            description: Unexpected error
+            schema:
+              $ref: "#/definitions/ServerError"
+
+    post: 
+      description: Update pricing, country, or PSP specific info
+      parameters:
+        - name: plan_name
+          in: path
+          description: unique name of a plan
+          required: true
+          type: string
+        - name: country
+          in: path
+          description: two letter country code 
+          required: true
+          type: string
+        - name: body
+          in: body
+          schema: 
+            $ref: "#/definitions/PricingUpdateParams"
+
+      responses:
+        200:
+          description: Indication that update succeeded
+          schema:
+            $ref: "#/definitions/Plan"
+        400:
+          description: Indication that there was a problem with the request
+        404:
+          description: Indication that there is no plan with that combination of plan_name and country
+        default:
+            description: Unexpected error
+            schema:
+              $ref: "#/definitions/ServerError"
+
+    put:
+      description: Create pricing and country specific info for the given plan_name (i.e. currency, amount)
+      parameters:
+        - name: plan_name
+          in: path
+          description: unique name of a plan
+          required: true
+          type: string
+        - name: country
+          in: path
+          description: two letter country code 
+          required: true
+          type: string
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/PricingUpdateParams"
+
+      responses:
+        201:
+          description: Indication that creation was Successful
+          schema:
+            $ref: "#/definitions/Plan"
+        400:
+          description: Indication that there was a problem with the request
+        404:
+          description: Indication that there was is no plan with that plan_name
+        default:
+            description: Unexpected error
+            schema:
+              $ref: "#/definitions/ServerError"
+
+  /plans/{country}/psp/{psp}:
+    get:
+      description: Gets all plans that are available for the specified country
+      parameters:
+        - name: country
+          in: path
+          description: two letter country code
+          required: true
+          type: string
+        - name: psp
+          in: path
+          description: the payment processor we expect to charge with ('stripe' or 'apple')
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: List of plans
+            type: array
+            items:
+              $ref: "#/definitions/Plan"
+        404:
+          description: Indication that there are no available plans for the specified country and PSP
+        default:
+            description: Unexpected error
+            schema:
+              $ref: "#/definitions/ServerError"
 
 definitions:
-  Error:
-    description: A minimal error object based on JSON API error objects.
+  ServerError:
     required:
-      - title
-      - detail
+      - message
+      - code
     properties:
-      title:
+      message: 
         type: string
-        description: A short summary of the problem.
-      detail:
-        type: string
-        description: An explanation of the problem.
+      code:
+        type: integer
 
-  Psp:
-    description: The payment service provider.
-    type: string
-    enum:
-      - Apple
-      - Stripe
+  EntitlementUpdateParams:
+    properties:
+      member_limit:
+        description: integer for number of members a plan permits. -1 for no limit
+        type: integer
+        format: int64
+      leader_limit:
+        description: integer for number of leaders a plan permits. -1 for no limit
+        type: integer
+        format: int64
+      max_groups:
+        description: integer for number of groups a plan permis. -1 for no limit
+        type: integer
+        format: int64
 
-  SubscriptionParams:
-    description: The request object to create a new Subscription.
-    required:
-      - subscriberId
-      - planId
-      - pricePointId
-      - psp
-      - token
-    properties:
-      subscriberId:
-        type: integer
-        format: int64
-      planId:
-        type: integer
-        format: int64
-      pricePointId:
-        type: integer
-        format: int64
-      psp:
-        $ref: "#/definitions/Psp"
-      token:
-        type: string
+  PricingUpdateParams:
+    allOf:
+      - $ref: "#/definitions/PricingInfo"
+      - $ref: "#/definitions/PspPlanInfo"
 
-  Coupon:
-    description: TODO
-    required:
-      - percentageOff
-      - status
+  PlanUpdateParams:
     properties:
-      percentageOff:
+      status: 
+        description: String for the status of the plan. One of - available, unavailable, notForSale (??? when it is not available for sale anymore but still active ???)
+        type: string
+      trial_interval:
         type: integer
         format: int64
-      expirationDate:
+      trial_interval_unit:
         type: string
-        format: date-time
-      status:
-        type: string
-        
-  Entitlements:
-    description: TODO
-    properties:
-      maxGroups:
-        type: integer
-        format: int32
-      maxUsers:
-        type: integer
-        format: int32
-        
+      trial_on:
+        type: boolean
+
   Plan:
-    description: The Subscription plan.
     required:
-      - name
-      - entitlements
+      - id
+      - plan
+      - pricing
+      - psp_info
     properties:
-      name:
+      id:
+        type: string
+      plan:
+        $ref: "#/definitions/BasePlan"
+      pricing:
+        $ref: "#/definitions/PricingInfo"
+      psp_info:
+        $ref: "#/definitions/PspPlanInfo"
+
+  PricingInfo:
+    required:
+      - amount
+      - currency
+      - country
+    properties:
+      amount:
+        type: integer
+        format: int64
+      currency:
+        type: string
+      country:
+        type: string
+
+  Entitlements:
+    properties:
+      member_limit:
+        type: integer
+        format: int64
+      leader_limit:
+        type: integer
+        format: int64
+      max_groups: 
+        type: integer
+        format: int64 
+
+  PspPlanInfo:
+    required:
+      - psp
+      - plan_ref
+    properties:
+      psp:
+        type: string
+        enum:
+          - Apple
+          - Stripe
+      plan_ref:
+        type: string
+
+  BasePlan:
+    required:
+      - plan_name
+      - display_name
+      - bill_interval
+      - bill_interval_unit
+      - status
+      - entitlements
+
+    properties:
+      plan_name: # unique name that can be used to look up a plan
+        type: string
+      display_name: # human readable name that can be displayed to end user 
+        type: string
+      bill_interval:
+        type: integer
+        format: int64
+      bill_interval_unit:
+        type: string
+      trial_interval:
+        type: integer
+        format: int64
+      trial_interval_unit:
+        type: string
+      status:
         type: string
       entitlements:
         $ref: "#/definitions/Entitlements"
-        
-  PricePoint:
-    description: The Subscription price point.
-    required:
-      - amount
-      - currency
-    properties:
-      amount:
-        type: number
-      currency:
-        type: string
-      renewalDuration:
-        type: integer
-        format: int64
-      renewalDurationUnit:
-        type: string
-      trialDuration:
-        type: integer
-        format: int64
-      trialDurationUnit:
-        type: string
-        
-  Charge:
-    description: TODO
-    required:
-      - amount
-      - currency
-      - date
-      - status
-    properties:
-      amount:
-        type: number
-      currency:
-        type: string
-      date:
-        type: string
-        format: date-time
-      status:
-        type: string
-        
-  Invoice:
-    description: TODO
-    required:
-      - amount
-      - currency
-      - date
-      - charges
-      - status
-    properties:
-      amount:
-        type: number
-      currency:
-        type: string
-      date:
-        type: string
-        format: date-time
-      charges:
-        type: array
-        items:
-          $ref: "#/definitions/Charge"
-      coupon:
-        $ref: "#/definitions/Coupon"
-      status:
-        type: string
-        
-  Subscription:
-    description: A Subscription.
-    required:
-      - startDate
-      - plan
-      - pricePoint
-      - invoices
-      - status
-      - psp
-    properties:
-      startDate:
-        type: string
-        format: date-time
-      endDate:
-        type: string
-        format: date-time
-      trialStartDate:
-        type: string
-        format: date-time
-      trialEndDate:
-        type: string
-        format: date-time
-      plan:
-        $ref: "#/definitions/Plan"
-      pricePoint:
-        $ref: "#/definitions/PricePoint"
-      renewalPlan:
-        $ref: "#/definitions/Plan"
-      renewalPricePoint:
-        $ref: "#/definitions/PricePoint"
-      invoices:
-        type: array
-        items:
-          $ref: "#/definitions/Invoice"
-      status:
-        type: string
-      psp:
-        $ref: "#/definitions/Psp"
-        
-  Subscriber:
-    description: A Subscriber provides data about an organizer in the context of its subscriptions.
-    required:
-      - id
-      - identifier
-      - inactiveSubscriptions
-      - coupons
-      - status
-      - created
-      - modified
-    properties:
-      id:
-        type: integer
-        format: int64
-      identifier:
-        type: string
-      availableSubscription:
-        $ref: "#/definitions/Subscription"
-      inactiveSubscriptions:
-        type: array
-        items:
-          $ref: "#/definitions/Subscription"
-      coupons:
-        type: array
-        uniqueItems: true
-        items:
-          $ref: "#/definitions/Coupon"
-      status:
-        type: string
-      created:
-        type: string
-        format: date-time
-      modified:
-        type: string
-        format: date-time
