@@ -9,7 +9,9 @@ object Parser {
     try {
       Right(org.json4s.native.JsonMethods.parse(s))
     } catch {
-      case scala.util.control.NonFatal(e) => Left(e.getMessage)
+      case scala.util.control.NonFatal(e) =>
+        e.printStackTrace
+        Left(e.getMessage)
     }
 
   def deparse[A](j: JValue): String =

@@ -37,6 +37,7 @@ object {{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{cla
         val raw = j.extract[{{#dataType}}{{.}}{{/dataType}}{{^dataType}}{{datatype}}{{/dataType}}]
         fromValue(raw).toRight(s"[$raw] does not map to a known [{{#datatypeWithEnum}}{{.}}{{/datatypeWithEnum}}{{^datatypeWithEnum}}{{classname}}{{/datatypeWithEnum}}] enum instance!")
       } catch {
+        case e: MappingException => Left(e.getCause.getMessage)
         case scala.util.control.NonFatal(e) => Left(e.getMessage)
       }
 

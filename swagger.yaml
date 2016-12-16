@@ -64,26 +64,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: "#/definitions/ServerError"
-    post:
-      description: Synonymous with POST /plans/country/:country/name/:plan_name, just with an explicit id
-      parameters:
-        - name: id
-          in: path
-          description: unique id of a plan for a given country
-          required: true
-          type: string
-
-      responses:
-        200:
-          description: Successfully updated
-          schema:
-            $ref: "#/definitions/Plan"
-        404:
-          description: Indication that no plan with that id exists
-        default:
-            description: Unexpected error
-            schema:
-              $ref: "#/definitions/ServerError"
 
   /plans/name/{plan_name}:
     get:
@@ -98,60 +78,6 @@ paths:
           description: Successful response
           schema:
             $ref: "#/definitions/BasePlan"
-        404:
-          description: Indication that there is no plan with that plan_name
-        default:
-            description: Unexpected error
-            schema:
-              $ref: "#/definitions/ServerError"
-    post:
-      description: Update the plan with the corresponding parameters
-      parameters:
-        - name: plan_name
-          in: path
-          description: unique name of a plan
-          required: true
-          type: string
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: "#/definitions/PlanUpdateParams"
-
-      responses:
-        200:
-          description: Successful response
-          schema:
-            $ref: "#/definitions/Plan"
-        400:
-          description: Indication that there was a problem with the request
-        404:
-          description: Indication that there is no plan with that plan_name
-        default:
-            description: Unexpected error
-            schema:
-              $ref: "#/definitions/ServerError"
-
-  /plans/name/{plan_name}/entitlements:
-    post:
-      description: Update the entitlements for a given plan
-      parameters: 
-        - name: plan_name
-          in: path
-          required: true
-          type: string
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: "#/definitions/EntitlementUpdateParams"
-      responses:
-        200:
-          description: Successfully updated
-          schema:
-            $ref: "#/definitions/BasePlan"
-        400:
-          description: Indication that there was a problem with the request
         404:
           description: Indication that there is no plan with that plan_name
         default:
@@ -180,70 +106,6 @@ paths:
             $ref: "#/definitions/Plan"
         404:
           description: Indication that no plan with that plan_name exists. Any country that is not specificallly supported will be defaulted to standard i18n plans.
-        default:
-            description: Unexpected error
-            schema:
-              $ref: "#/definitions/ServerError"
-
-    post: 
-      description: Update pricing, country, or PSP specific info
-      parameters:
-        - name: plan_name
-          in: path
-          description: unique name of a plan
-          required: true
-          type: string
-        - name: country
-          in: path
-          description: two letter country code 
-          required: true
-          type: string
-        - name: body
-          in: body
-          schema: 
-            $ref: "#/definitions/PricingUpdateParams"
-
-      responses:
-        200:
-          description: Indication that update succeeded
-          schema:
-            $ref: "#/definitions/Plan"
-        400:
-          description: Indication that there was a problem with the request
-        404:
-          description: Indication that there is no plan with that combination of plan_name and country
-        default:
-            description: Unexpected error
-            schema:
-              $ref: "#/definitions/ServerError"
-
-    put:
-      description: Create pricing and country specific info for the given plan_name (i.e. currency, amount)
-      parameters:
-        - name: plan_name
-          in: path
-          description: unique name of a plan
-          required: true
-          type: string
-        - name: country
-          in: path
-          description: two letter country code 
-          required: true
-          type: string
-        - name: body
-          in: body
-          schema:
-            $ref: "#/definitions/PricingUpdateParams"
-
-      responses:
-        201:
-          description: Indication that creation was Successful
-          schema:
-            $ref: "#/definitions/Plan"
-        400:
-          description: Indication that there was a problem with the request
-        404:
-          description: Indication that there was is no plan with that plan_name
         default:
             description: Unexpected error
             schema:
