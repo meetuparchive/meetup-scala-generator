@@ -5,7 +5,15 @@ import io.netty.handler.codec.http.{HttpHeaderNames, HttpResponseStatus}
 import io.reactivex.netty.protocol.http.server.{HttpServerRequest, HttpServerResponse, RequestHandler}
 
 /**
- * Handler for readiness (/_ready) and liveness (TODO) checks for Kubernetes 
+ * Handler for readiness (/_ready) and liveness (TODO) checks for Kubernetes.
+ *
+ * Kubernetes allows a service to define readiness and liveness checks.  If an http endpoint is defined as
+ * the readiness check, Kubernetes will not start directing traffic to the container until it returns an
+ * http response status between 200 and 400.
+ *
+ * The `Runner` class allows you to override the `setInitialReadiness` method if you do not want the server
+ * to immediately report that it is ready to handle traffic, in which case you can set `KubernetesHandler.ready`
+ * to true when appropriate.
  */
 class KubernetesHandler(handler: RequestHandler[ByteBuf, ByteBuf]) extends RequestHandler[ByteBuf, ByteBuf] {
 
