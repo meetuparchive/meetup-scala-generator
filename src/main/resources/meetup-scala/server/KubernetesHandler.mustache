@@ -1,0 +1,40 @@
+package {{invokerPackage}}
+
+import io.netty.buffer.ByteBuf
+import io.netty.handler.codec.http.{HttpHeaderNames, HttpResponseStatus}
+import io.reactivex.netty.protocol.http.server.{HttpServerRequest, HttpServerResponse, RequestHandler}
+
+/**
+ * Handler for readiness (/_ready) and liveness (TODO) checks for Kubernetes 
+ */
+class KubernetesHandler(handler: RequestHandler[ByteBuf, ByteBuf]) extends RequestHandler[ByteBuf, ByteBuf] {
+
+  override def handle(
+    request: HttpServerRequest[ByteBuf],
+    response: HttpServerResponse[ByteBuf]) = {
+
+    if (request.getPath.startsWith("/_ready")) {
+      val message = if (KubernetesHandler.ready) {
+        response.setStatus(HttpResponseStatus.OK)
+        """{"ready": true}"""
+      } else {
+        response.setStatus(HttpResponseStatus.SERVICE_UNAVAILABLE)
+        """{"ready": false}"""
+      }
+      val messageBytes = message.getBytes("UTF-8")
+      val content: ByteBuf =
+        response.getAllocator
+          .buffer(messageBytes.length)
+          .writeBytes(messageBytes)
+      val headers = response.getHeaders
+      response.setStatus(HttpResponseStatus.OK)
+      headers.set(HttpHeaderNames.CONTENT_LENGTH, messageBytes.length)
+      headers.set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8")
+      response.writeAndFlush(content)
+    } else handler.handle(request, response)
+  }
+}
+
+object KubernetesHandler {
+  var ready: Boolean = false
+}
