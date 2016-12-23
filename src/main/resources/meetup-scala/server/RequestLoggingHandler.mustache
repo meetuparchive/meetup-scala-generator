@@ -29,10 +29,6 @@ class RequestLoggingHandler(handler: RequestHandler[ByteBuf, ByteBuf]) extends R
         case addr => s"unknown socket address type: $addr"
       }
 
-    s"""
-       |Request from $remoteAddress
-       |${request.getHttpVersion} ${request.getHttpMethod} ${request.getUri}
-       |$headers
-     """.stripMargin
+    s"""Request from $remoteAddress ${request.getHttpVersion} ${request.getHttpMethod} ${request.getUri} $headers"""
   }
 }
