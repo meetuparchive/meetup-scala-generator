@@ -22,30 +22,9 @@ info:
 # PUT  /plans/country/:country/name/:plan_name -> creates pricing and country specific info for the given plan_name (i.e. currency, amount)
 
 paths:
-  /plans:
-    post:
-      description: Create a new base plan (no country/pricing info)
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: "#/definitions/BasePlan"
-
-      responses:
-        201:
-          description: Indication that plan creation succeeded
-          schema:
-            $ref: "#/definitions/BasePlan"
-        400:
-          description: Indication of a bad request
-        default:
-          description: Unexpected error
-          schema:
-            $ref: "#/definitions/ServerError"
-
   /plans/{id}:
     get:
+      tags: [PlanService]
       description: Synonymous with GET /plans/country/:country/name/:plan_name, just with an explicit id
       parameters:
         - name: id
@@ -64,9 +43,9 @@ paths:
           description: Unexpected error
           schema:
             $ref: "#/definitions/ServerError"
-
   /plans/name/{plan_name}:
     get:
+      tags: [PlanService]
       description: Get specificied base plan (no country specific info)
       parameters:
         - name: plan_name
@@ -84,9 +63,9 @@ paths:
             description: Unexpected error
             schema:
               $ref: "#/definitions/ServerError"
-
   /plans/country/{country}/name/{plan_name}:
     get:
+      tags: [PlanService]
       description: Get plan details including pricing, country, and PSP specific info
       parameters:
         - name: plan_name
@@ -113,6 +92,7 @@ paths:
 
   /plans/{country}/psp/{psp}:
     get:
+      tags: [PlanService]
       description: Gets all plans that are available for the specified country
       parameters:
         - name: country

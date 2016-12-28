@@ -64,14 +64,21 @@ object ApiInvoker {
 
   val defaultApiInvoker: ApiInvoker = get(defaultOkkHttp)
 
+  def resolvePort(uri: URI): Int =
+    (uri.getPort, uri.getScheme.toLowerCase) match {
+      case (-1, "http") => 80
+      case (-1, "https") => 443
+      case (port, _) => port
+    }
+
   def getRequestBuilder(baseUrl: String, path: String, queryParams: Map[String, String]): Request.Builder = {
     val uri = new URI(baseUrl)
     val finalPath = uri.getPath + (if(path.startsWith("/")) path.drop(1) else path)
     val builder = new HttpUrl.Builder()
       .host(uri.getHost)
-      .port(uri.getPort)
-       .scheme(uri.getScheme)
-       .addPathSegments(finalPath)
+      .port(resolvePort(uri))
+      .scheme(uri.getScheme)
+      .addPathSegments(finalPath)
 
     val url =
       queryParams
