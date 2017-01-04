@@ -36,8 +36,9 @@ object Server extends Logging {
        metrics reporting. */
     val metricsHandler = new HystrixMetricsStreamHandler(handler)
     val rainbowsHandler = new RainbowsHandler(metricsHandler)
-    val loggingHandler = new RequestLoggingHandler(rainbowsHandler)
-
+    val kubernetesHandler = new KubernetesHandler(rainbowsHandler)
+    val loggingHandler = new RequestLoggingHandler(kubernetesHandler)
+    
     val server: HttpServer[ByteBuf, ByteBuf] =
       RxNetty.createHttpServer(port, loggingHandler)
         .withErrorResponseGenerator(
