@@ -49,7 +49,7 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
             
             {{^bodyParams}}
             val result:{{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}(
-            {{#pathParams}}{{#isPathParam}}{{paramName}}.to{{dataType}}{{/isPathParam}}{{#hasMore}}, {{/hasMore}}{{/pathParams}})
+            {{#pathParams}}{{paramName}}.to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/pathParams}})
             val r: JObservable[Void] = respond(result, response)
             r
             {{/bodyParams}}
@@ -75,12 +75,6 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
      def badRequest(response: HttpServerResponse[ByteBuf]) = {
        response.setStatus(HttpResponseStatus.BAD_REQUEST)
        response.writeString("Bad request")
-       response.close(true)
-     }
-     
-     def fakeResponse(response: HttpServerResponse[ByteBuf]) = {
-       response.setStatus(HttpResponseStatus.OK)
-       response.writeString("Hello")
        response.close(true)
      }
 
