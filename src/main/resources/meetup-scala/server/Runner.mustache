@@ -19,10 +19,22 @@ trait Runner {
    */
   def initializeService(environment: Map[String, String], args: Array[String]): (Service, () => Unit)
 
+  /**
+   * Set the initial readiness of the server.
+   *
+   * By default, the server will be immediately ready to serve traffic once initializeService is
+   * complete.  If there is more complex behavior that your service requires, override this function
+   * and set `KubernetesHandler.ready` to true when the server is ready.
+   */
+  def setInitialReadiness(): Unit = {
+    KubernetesHandler.ready = true
+  }
+  
   final def main(args: Array[String]) {
     /* Initialize the application and server, and get shutdown function. */
 
     val (service, doShutdownService) = initializeService(sys.env, args)
+    setInitialReadiness()
     val (server, doShutdownServer) = Server(9000, service)
 
     if (Thread.currentThread().getName.startsWith("run-main-")) {
