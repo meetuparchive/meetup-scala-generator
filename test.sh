@@ -46,10 +46,22 @@ done
 A_PATH=$A_DIR/$A_NAME-$A_VERSION.jar
 
 GEN_DIR=generated-$GEN_ARG
+BUILD_OUT=$TMPDIR/generated-build-$RANDOM.out
 
 echo "  -> Running the code generator ..."
-export CP=$A_PATH && $CODEGEN generate -i $SWAGGER_SPEC -l $GEN_NAME -o $GEN_DIR > /dev/null 2>&1
+CP=$A_PATH $CODEGEN generate -i $SWAGGER_SPEC -l $GEN_NAME -o $GEN_DIR > $BUILD_OUT 2>&1
+RES=$?
 
+# It's possible to fail here, most interestingly for malformed swagger.
+# Exit with code of the code generation attempt.
+if [ $RES -ne 0 ]; then
+  cat $BUILD_OUT
+  rm $BUILD_OUT
+  echo "[ FAILED with exit code $RES ]"
+  exit $RES
+else
+  echo "[ PASSED ]"
+fi
 
 # Currently client generation does not produce a project, as its intended to output source
 # within an existing code base. Thus we provide one here so we can test the generated code
@@ -70,8 +82,8 @@ popd > /dev/null
 
 # Exit with code of the build attempt.
 if [ $RES -ne 0 ]; then
-  echo "[ FAILED with exit code $RES ]"
   cat $BUILD_OUT
+  echo "[ FAILED with exit code $RES ]"
 else
   echo "[ PASSED ]"
 fi
