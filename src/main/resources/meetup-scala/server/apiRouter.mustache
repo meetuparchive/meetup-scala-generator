@@ -48,8 +48,12 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
             {{/bodyParams}}
             
             {{^bodyParams}}
-            val result:{{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}(
-            {{#pathParams}}{{paramName}}.to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/pathParams}})
+            {{#queryParams}}val queryParams = request.getQueryParameters{{/queryParams}}
+            val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}(
+            {{#pathParams}}{{paramName}}.to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/pathParams}}
+            {{#queryParams}}{{#pathParams}}, {{/pathParams}}queryParams.get("{{paramName}}").get(0).to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/queryParams}}
+            {{#formParams}}{{#queryParams}}, {{/queryParams}}{{^queryParams}}{{#pathParams}}, {{/pathParams}}{{/queryParams}}queryParams.get("{{paramName}}").get(0).to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/formParams}}
+            )
             val r: JObservable[Void] = respond(result, response)
             r
             {{/bodyParams}}
