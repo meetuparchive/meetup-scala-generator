@@ -12,11 +12,23 @@ final class {{classname}}(basePath: String, invoker: ApiInvoker) {
     def {{operationId}}({{#allParams}}{{paramName}}: {{dataType}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): Future[{{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}] = {
     val path = "{{{path}}}"{{#pathParams}}.replaceAll("\\{" + "{{baseName}}" + "\\}", {{paramName}}.toString){{/pathParams}}
 
+    // query params
+    val queryParams =
+      Map[String, String](
+        {{#queryParams}}"{{paramName}}" -> {{paramName}}.toString{{#hasMore}},{{/hasMore}}{{/queryParams}}
+      )
+
+    // form params
+    val form =
+      Map[String, String](
+        {{#formParams}}"{{paramName}}" -> {{paramName}}.toString{{#hasMore}},{{/hasMore}}{{/formParams}}
+      )
+
     {{#bodyParam}}
-    invoker.invoke{{httpMethod}}[{{dataType}}, {{returnType}}](basePath, path, Map(), Option({{paramName}}))
+    invoker.invoke{{httpMethod}}[{{dataType}}, {{returnType}}](basePath, path, queryParams, {{paramName}})
     {{/bodyParam}}
     {{^bodyParam}}
-    invoker.invoke{{httpMethod}}{{#returnType}}[{{returnType}}]{{/returnType}}(basePath, path, Map())
+    invoker.invoke{{httpMethod}}{{#returnType}}[{{returnType}}]{{/returnType}}(basePath, path, queryParams, form)
     {{/bodyParam}}
   }
 {{/operation}}

@@ -8,27 +8,48 @@ import scala.concurrent.Future
 final class ApiInvoker private (okHttp: OkHttpClient) {
   import ApiInvoker.{getRequestBuilder, JsonMediaType}
 
-  def invokeDELETE(baseUrl: String, path: String, queryParams: Map[String, String]): Future[Unit] = {
+  def invokeDELETE(baseUrl: String, path: String, queryParams: Map[String, String], form: Map[String, String]): Future[Unit] = {
     val req = getRequestBuilder(baseUrl, path, queryParams)
       .delete()
       .build()
+
     dispatchRequest[Unit](req, { _ => Right(Unit) })
   }
 
-  def invokePOST[A : Codec, B : Codec](baseUrl: String, path: String, queryParams: Map[String, String], body: Option[A] = None): Future[B] = {
-    val reqBuilder = getRequestBuilder(baseUrl, path, queryParams)
-    val serializedBody: Option[String] = body.map(Serializer.serialize[A])
-    val req = serializedBody
-      .map(jsonStr => reqBuilder.post(RequestBody.create(JsonMediaType, jsonStr)))
-      .getOrElse(reqBuilder)
-      .build()
+  def invokePOST[A : Codec](baseUrl: String, path: String, queryParams: Map[String, String], form: Map[String, String]): Future[A] = {
+    val reqBuilder =
+      getRequestBuilder(baseUrl, path, queryParams)
+
+    val req =
+      (if(form.nonEmpty)
+        reqBuilder.post(
+          form.foldLeft(new FormBody.Builder()) {
+            case (acc, (k, v)) => acc.add(k, v)
+          }
+          .build()
+        )
+      else
+        reqBuilder).build()
+
+    dispatchCodecRequest[A](req)
+  }
+
+  def invokePOST[A : Codec, B : Codec](baseUrl: String, path: String, queryParams: Map[String, String], body: A): Future[B] = {
+    val serializedBody: String = Serializer.serialize[A](body)
+
+    val req =
+      getRequestBuilder(baseUrl, path, queryParams)
+        .post(RequestBody.create(JsonMediaType, serializedBody))
+        .build()
+
     dispatchCodecRequest[B](req)
   }
 
-  def invokeGET[A : Codec](baseUrl: String, path: String, queryParams: Map[String, String]): Future[A] = {
+  def invokeGET[A : Codec](baseUrl: String, path: String, queryParams: Map[String, String], form: Map[String, String]): Future[A] = {
     val req = getRequestBuilder(baseUrl, path, queryParams)
       .get()
       .build()
+
     dispatchCodecRequest[A](req)
   }
 
