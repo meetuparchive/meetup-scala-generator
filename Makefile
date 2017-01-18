@@ -28,8 +28,7 @@ no_op__:
 __package-sbt: component-test-generated
 	sbt clean \
 	test \
-	publishLocal \
-	component:test
+	publishLocal
 
 __publish-sbt: __package-sbt
 	sbt publish cleanLocal
