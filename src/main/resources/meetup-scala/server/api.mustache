@@ -1,12 +1,11 @@
 package {{package}}
 {{#operations}}
-    {{#imports}}import {{import}}
-    {{/imports}}
+{{#imports}}import {{import}}
+{{/imports}}
 
-    trait {{classname}} {
-
+trait {{classname}} {
     {{#operation}}
-        def {{operationId}}({{#allParams}}{{paramName}}: {{dataType}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}
+    def {{operationId}}({{#allParams}}{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}
     {{/operation}}
-    }
+}
 {{/operations}}
