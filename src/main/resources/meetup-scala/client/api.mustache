@@ -1,4 +1,7 @@
 package {{package}}
+
+import collection.mutable.MapBuilder
+
 {{#operations}}
 {{#imports}}import {{import}}
 {{/imports}}
@@ -9,20 +12,22 @@ import scala.concurrent.Future
 final class {{classname}}(basePath: String, invoker: ApiInvoker) {
 
 {{#operation}}
-    def {{operationId}}({{#allParams}}{{paramName}}: {{dataType}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): Future[{{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}] = {
+    def {{operationId}}({{#allParams}}{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): Future[{{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}] = {
     val path = "{{{path}}}"{{#pathParams}}.replaceAll("\\{" + "{{baseName}}" + "\\}", {{paramName}}.toString){{/pathParams}}
 
     // query params
-    val queryParams =
-      Map[String, String](
-        {{#queryParams}}"{{paramName}}" -> {{paramName}}.toString{{#hasMore}},{{/hasMore}}{{/queryParams}}
-      )
+    val queryParams = {
+      val _params = new MapBuilder[String, String, Map[String, String]](Map.empty)
+      {{#queryParams}}{{#required}}_params += ("{{paramName}}" -> {{paramName}}.toString){{/required}}{{^required}}{{paramName}}.foreach { v => _params += ("{{paramName}}" -> v.toString) }{{/required}}{{/queryParams}}
+      _params.result()
+    }
 
     // form params
-    val form =
-      Map[String, String](
-        {{#formParams}}"{{paramName}}" -> {{paramName}}.toString{{#hasMore}},{{/hasMore}}{{/formParams}}
-      )
+    val form = {
+      val _params = new MapBuilder[String, String, Map[String, String]](Map.empty)
+      {{#formParams}}{{#required}}_params += ("{{paramName}}" -> {{paramName}}.toString){{/required}}{{^required}}{{paramName}}.foreach { v => _params += ("{{paramName}}" -> v.toString) }{{/required}}{{/formParams}}
+      _params.result()
+    }
 
     {{#bodyParam}}
     invoker.invoke{{httpMethod}}[{{dataType}}, {{returnType}}](basePath, path, queryParams, {{paramName}})

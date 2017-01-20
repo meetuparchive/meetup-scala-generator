@@ -46,13 +46,13 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
             }
             r
             {{/bodyParams}}
-            
+
             {{^bodyParams}}
             val queryParams = request.getQueryParameters
             val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}(
             {{#pathParams}}{{paramName}}.to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/pathParams}}
-            {{#queryParams}}{{#pathParams}}, {{/pathParams}}queryParams.get("{{paramName}}").get(0).to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/queryParams}}
-            {{#formParams}}{{#queryParams}}, {{/queryParams}}{{^queryParams}}{{#pathParams}}, {{/pathParams}}{{/queryParams}}queryParams.get("{{paramName}}").get(0).to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/formParams}}
+            {{#queryParams}}{{#pathParams}}, {{/pathParams}}{{^required}}Option({{/required}}queryParams.get("{{paramName}}").get(0).to{{dataType}}{{^required}}){{/required}}{{#hasMore}}, {{/hasMore}}{{/queryParams}}
+            {{#formParams}}{{#queryParams}}, {{/queryParams}}{{^queryParams}}{{#pathParams}}, {{/pathParams}}{{/queryParams}}{{^required}}Option({{/required}}queryParams.get("{{paramName}}").get(0).to{{dataType}}{{^required}}){{/required}}{{#hasMore}}, {{/hasMore}}{{/formParams}}
             )
             val r: JObservable[Void] = respond(result, response)
             r
