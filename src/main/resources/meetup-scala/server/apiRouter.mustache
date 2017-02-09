@@ -9,7 +9,7 @@ import io.reactivex.netty.protocol.http.server.{HttpServerRequest, HttpServerRes
 
 import io.netty.handler.codec.http.{HttpHeaderNames, HttpResponseStatus}
 
-import {{invokerPackage}}.{Router, Serializer, Codec, Service}
+import {{invokerPackage}}.{Router, Serializer, Codec, Service, Util}
 
 import java.nio.charset.Charset
 
@@ -47,16 +47,29 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
             r
             {{/bodyParams}}
 
-            {{^bodyParams}}
-            val queryParams = request.getQueryParameters
-            val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}(
-            {{#pathParams}}{{paramName}}.to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/pathParams}}
-            {{#queryParams}}{{#pathParams}}, {{/pathParams}}{{^required}}Option({{/required}}queryParams.get("{{paramName}}"){{^required}}).map(_{{/required}}.get(0).to{{dataType}}{{^required}}){{/required}}{{#hasMore}}, {{/hasMore}}{{/queryParams}}
-            {{#formParams}}{{#queryParams}}, {{/queryParams}}{{^queryParams}}{{#pathParams}}, {{/pathParams}}{{/queryParams}}{{^required}}Option({{/required}}queryParams.get("{{paramName}}"){{^required}}).map(_{{/required}}.get(0).to{{dataType}}{{^required}}){{/required}}{{#hasMore}}, {{/hasMore}}{{/formParams}}
-            )
-            val r: JObservable[Void] = respond(result, response)
-            r
-            {{/bodyParams}}
+          {{#formParams}}
+          Util.getFormParameters(request).flatMap {
+            new Func1[Map[String, List[String]], rx.Observable[Void]]() {
+              override def call(params: Map[String, List[String]]): rx.Observable[Void] = {
+                val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} =
+                  api.{{operationId}}(
+                    {{#pathParams}}{{paramName}}.to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/pathParams}}
+                    {{#pathParams}}, {{/pathParams}}{{^required}}Option({{/required}}params.getOrElse("{{paramName}}", null){{^required}}).map(_{{/required}}.apply(0).to{{dataType}}{{^required}}){{/required}}{{#hasMore}}, {{/hasMore}})
+                val r: JObservable[Void] = respond(result, response)
+                r
+              }
+            }
+          }
+          {{/formParams}}
+
+          {{^bodyParams}}{{^formParams}}val queryParams = request.getQueryParameters
+          val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}(
+          {{#pathParams}}{{paramName}}.to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/pathParams}}
+          {{#queryParams}}{{#pathParams}}, {{/pathParams}}{{^required}}Option({{/required}}queryParams.get("{{paramName}}"){{^required}}).map(_{{/required}}.get(0).to{{dataType}}{{^required}}){{/required}}{{#hasMore}}, {{/hasMore}}{{/queryParams}}
+          )
+          val r: JObservable[Void] = respond(result, response)
+          r
+          {{/formParams}}{{/bodyParams}}
 {{/operation}}
            case _ => notFoundResponse(response)
          }

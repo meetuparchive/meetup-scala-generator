@@ -49,6 +49,7 @@ public class ScalaServerCodegen extends BaseScalaCodegen {
         supportingFiles.add(new SupportingFile("server/RainbowsHandler.mustache", invokerFolder, "RainbowsHandler.scala"));
         supportingFiles.add(new SupportingFile("server/RequestLoggingHandler.mustache", invokerFolder, "RequestLoggingHandler.scala"));
         supportingFiles.add(new SupportingFile("server/Server.mustache", invokerFolder, "Server.scala"));
+        supportingFiles.add(new SupportingFile("server/Util.mustache", invokerFolder, "Util.scala"));
         supportingFiles.add(new SupportingFile("server/KubernetesHandler.mustache", invokerFolder, "KubernetesHandler.scala"));
         
     }
