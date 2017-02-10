@@ -1,0 +1,63 @@
+package {{invokerPackage}}
+
+import io.netty.buffer.ByteBuf
+import io.netty.handler.codec.http.multipart.{Attribute, HttpPostRequestDecoder}
+import io.netty.handler.codec.http.{DefaultHttpContent, DefaultHttpRequest, LastHttpContent}
+import io.reactivex.netty.protocol.http.server.HttpServerRequest
+import rx.Observable
+import rx.functions.Func1
+
+/** Various request processing functions. */
+object Util {
+  /**
+    * Decode form parameters (URL-encoded name/value pairs) from an entity body.
+    * @param request
+    * @return An observable of the parameters.
+    */
+  def getFormParameters(request: HttpServerRequest[ByteBuf]): Observable[Map[String, List[String]]] = {
+    /* We can't get the underlying netty request, but we can reconstruct
+       enough of it to pass to netty's provided decoder. */
+    val nettyRequest =
+      new DefaultHttpRequest(
+        request.getHttpVersion,
+        request.getHttpMethod,
+        request.getUri)
+
+    /* Now add the headers. */
+    {
+      val i = request.getHeaders.entries().iterator()
+      while (i.hasNext) {
+        val h = i.next()
+        nettyRequest.headers().add(h.getKey, h.getValue)
+      }
+    }
+
+    /* Finally we can extract and decode the body. */
+    request
+      .getContent
+      .map(
+        new Func1[ByteBuf, Map[String, List[String]]] {
+          override def call(t: ByteBuf): Map[String, List[String]] = {
+            val content = new DefaultHttpContent(t)
+            val decoder = new HttpPostRequestDecoder(nettyRequest)
+            val x = decoder.offer(content)
+
+            val hm = scala.collection.mutable.HashMap.empty[String, List[String]]
+
+            decoder.offer(LastHttpContent.EMPTY_LAST_CONTENT)
+            val i = x.getBodyHttpDatas.iterator()
+            while (i.hasNext) {
+              i.next() match {
+                case a: Attribute =>
+                  val values = hm.getOrElse(a.getName, List.empty)
+                  hm.put(a.getName, a.getValue :: values)
+
+                case xx =>
+              }
+            }
+            decoder.cleanFiles()
+            hm.toMap
+          }
+        })
+  }
+}
