@@ -27,6 +27,13 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     private static final Set<String> NUMBER_TYPES =
             new HashSet<>(Arrays.asList("Int", "Long", "Float", "Double"));
 
+    @Override
+    /* Lifted from https://github.com/swagger-api/swagger-codegen/blob/master/modules/swagger-codegen/src/main/java/io/swagger/codegen/languages/AbstractScalaCodegen.java#L182-L185
+       to prevent injection. */
+    public String escapeUnsafeCharacters(String input) {
+        return input.replace("*/", "*_/").replace("/*", "/_*");
+    }
+
     public static Set<String> getNumberTypes() {
         Set<String> copy = new HashSet<>();
         copy.addAll(NUMBER_TYPES);
