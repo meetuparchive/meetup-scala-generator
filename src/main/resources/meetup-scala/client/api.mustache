@@ -18,14 +18,16 @@ final class {{classname}}(basePath: String, invoker: ApiInvoker) {
     // query params
     val queryParams = {
       val _params = new MapBuilder[String, String, Map[String, String]](Map.empty)
-      {{#queryParams}}{{#required}}_params += ("{{paramName}}" -> {{paramName}}.toString){{/required}}{{^required}}{{paramName}}.foreach { v => _params += ("{{paramName}}" -> v.toString) }{{/required}}{{/queryParams}}
+      {{#queryParams}}{{#required}}_params += ("{{paramName}}" -> {{paramName}}.toString){{/required}}{{^required}}{{paramName}}.foreach { v => _params += ("{{paramName}}" -> v.toString) }{{/required}}
+      {{/queryParams}}
       _params.result()
     }
 
     // form params
     val form = {
       val _params = new MapBuilder[String, String, Map[String, String]](Map.empty)
-      {{#formParams}}{{#required}}_params += ("{{paramName}}" -> {{paramName}}.toString){{/required}}{{^required}}{{paramName}}.foreach { v => _params += ("{{paramName}}" -> v.toString) }{{/required}}{{/formParams}}
+      {{#formParams}}{{#required}}_params += ("{{paramName}}" -> {{paramName}}.toString){{/required}}{{^required}}{{paramName}}.foreach { v => _params += ("{{paramName}}" -> v.toString) }{{/required}}
+      {{/formParams}}
       _params.result()
     }
 
