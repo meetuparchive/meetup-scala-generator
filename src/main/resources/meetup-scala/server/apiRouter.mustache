@@ -54,7 +54,7 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
                 val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} =
                   api.{{operationId}}(
                     {{#pathParams}}{{paramName}}.to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/pathParams}}
-                    {{#pathParams}}, {{/pathParams}}{{^required}}Option({{/required}}params.getOrElse("{{paramName}}", null){{^required}}).map(_{{/required}}.apply(0).to{{dataType}}{{^required}}){{/required}}{{#hasMore}}, {{/hasMore}})
+                    {{#hasPathParams}}, {{/hasPathParams}}{{^required}}Option({{/required}}params.getOrElse("{{paramName}}", null){{^required}}).map(_{{/required}}.apply(0).to{{dataType}}{{^required}}){{/required}}{{#hasMore}}, {{/hasMore}})
                 val r: JObservable[Void] = respond(result, response)
                 r
               }
@@ -65,7 +65,7 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
           {{^bodyParams}}{{^formParams}}val queryParams = request.getQueryParameters
           val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}(
           {{#pathParams}}{{paramName}}.to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/pathParams}}
-          {{#queryParams}}{{#hasPathParams}}, {{/hasPathParams}}{{^required}}Option({{/required}}queryParams.get("{{paramName}}"){{^required}}).map(_{{/required}}.get(0).to{{dataType}}{{^required}}){{/required}}{{#hasMore}}/* has more query params */, {{/hasMore}}{{/queryParams}}
+          {{#hasQueryParams}}{{#hasPathParams}}, {{/hasPathParams}}{{#queryParams}}{{^required}}Option({{/required}}queryParams.get("{{paramName}}"){{^required}}).map(_{{/required}}.get(0).to{{dataType}}{{^required}}){{/required}}{{#hasMore}}/* has more query params */, {{/hasMore}}{{/queryParams}}{{/hasQueryParams}}
           )
           val r: JObservable[Void] = respond(result, response)
           r
