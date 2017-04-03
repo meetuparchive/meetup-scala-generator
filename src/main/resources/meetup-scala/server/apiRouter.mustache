@@ -80,10 +80,10 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
          response.setStatus(HttpResponseStatus.OK)
          val content: ByteBuf =
              response.getAllocator
-             .buffer(message.length)
+             .buffer(message.getBytes.length)
              .writeBytes(message.getBytes)
          val headers = response.getHeaders
-         headers.set(HttpHeaderNames.CONTENT_LENGTH, message.length)
+         headers.set(HttpHeaderNames.CONTENT_LENGTH, message.getBytes.length)
          headers.set(HttpHeaderNames.CONTENT_TYPE, "application/json")
          response.write(content)
          response.close(true)
