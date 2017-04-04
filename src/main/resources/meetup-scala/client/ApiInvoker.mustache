@@ -112,5 +112,5 @@ object ApiInvoker {
   }
 
   def get(okHttp: OkHttpClient = defaultOkkHttp): ApiInvoker =
-    new ApiInvoker(defaultOkkHttp)
+    new ApiInvoker(okHttp)
 }
