@@ -16,94 +16,58 @@ import java.nio.charset.Charset
 import rx.functions.Func1
 import rx.{Observable => JObservable}
 
-class {{classname}}Router(api: {{classname}}) extends Router(api) {
-    def handleRequest(request: HttpServerRequest[ByteBuf], response: HttpServerResponse[ByteBuf]): rx.Observable[Void] = {
-        val path = request.getPath.split("/").toList.drop(1)
-        val method = request.getHttpMethod.name().toUpperCase()
+class {{classname}}TestRouter(api: {{classname}}) {
+  def handleRequest(request: HttpServerRequest[ByteBuf], response: HttpServerResponse[ByteBuf]): rx.Observable[Void] = {
+    val path = request.getPath.split("/").toList.drop(1)
+    val method = request.getHttpMethod.name().toUpperCase()
 
-        (path, method) match {
-{{#operation}}
-          case ({{{vendorExtensions.x-meetup-scala-op-case}}} :: Nil, "{{httpMethod}}") =>
-            {{#bodyParams}}
-            val body: rx.Observable[ByteBuf] = request
-              .getContent
+    (path, method) match { {{#operation}}
+      case ({{{vendorExtensions.x-meetup-scala-op-case}}} :: Nil, "{{httpMethod}}") =>
+        {{#hasBodyParam}}{{>server/entityBody}}{{/hasBodyParam}}{{#hasFormParams}}{{>server/entityBody}}{{/hasFormParams}}
 
-            val r: rx.Observable[Void] = body.flatMap {
-              new Func1[ByteBuf, rx.Observable[Void]]() {
-                override def call(byteBuf: ByteBuf): rx.Observable[Void] = {
-                  val json = byteBuf.toString(Charset.defaultCharset())
-                  val deserialized:Either[String, {{dataType}}] = Serializer.deserialize[{{dataType}}](json)
-                  deserialized match {
-                    case Right(content) =>
-                      val result:{{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}({{#pathParams}}{{paramName}}.to{{dataType}},{{/pathParams}}content)
-                      val r: JObservable[Void] = respond(result, response)
-                      r
-                    case Left(msg) =>
-                      badRequest(response)
-                  }
-                }
-              }
-            }
-            r
-            {{/bodyParams}}
+        /* (non-entity params) */
+        {{#hasQueryParams}}val queryParams = request.getQueryParameters{{/hasQueryParams}}
+        {{#allParams}}
+        {{#isPathParam}}/* path param: {{paramName}} */
+        val param_{{paramName}}: {{dataType}} = {{paramName}}.to{{dataType}}{{/isPathParam}}
+        {{#isQueryParam}}/* query param: {{paramName}} */
+        val param_{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}} = {{^required}}Option({{/required}}queryParams.get("{{paramName}}"){{^required}}).map(_{{/required}}.get(0).to{{dataType}}{{^required}}){{/required}}{{/isQueryParam}}
+        {{/allParams}}
 
-          {{#formParams}}
-          Util.getFormParameters(request).flatMap {
-            new Func1[Map[String, List[String]], rx.Observable[Void]]() {
-              override def call(params: Map[String, List[String]]): rx.Observable[Void] = {
-                val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} =
-                  api.{{operationId}}(
-                    {{#pathParams}}{{paramName}}.to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/pathParams}}
-                    {{#hasPathParams}}, {{/hasPathParams}}{{^required}}Option({{/required}}params.getOrElse("{{paramName}}", null){{^required}}).map(_{{/required}}.apply(0).to{{dataType}}{{^required}}){{/required}}{{#hasMore}}, {{/hasMore}})
-                val r: JObservable[Void] = respond(result, response)
-                r
-              }
-            }
-          }
-          {{/formParams}}
+        val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}({{#allParams}}param_{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
+        respond(result, response)
+        /* (end non-entity params) */
 
-          {{^bodyParams}}{{^formParams}}val queryParams = request.getQueryParameters
-          val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}(
-          {{#pathParams}}{{paramName}}.to{{dataType}}{{#hasMore}}, {{/hasMore}}{{/pathParams}}
-          {{#hasQueryParams}}{{#hasPathParams}}, {{/hasPathParams}}{{#queryParams}}{{^required}}Option({{/required}}queryParams.get("{{paramName}}"){{^required}}).map(_{{/required}}.get(0).to{{dataType}}{{^required}}){{/required}}{{#hasMore}}/* has more query params */, {{/hasMore}}{{/queryParams}}{{/hasQueryParams}}
-          )
-          val r: JObservable[Void] = respond(result, response)
-          r
-          {{/formParams}}{{/bodyParams}}
+        {{#hasBodyParam}} }} {{/hasBodyParam}}{{#hasFormParams}} }} {{/hasFormParams}}
 {{/operation}}
-           case _ => notFoundResponse(response)
-         }
-     }
+      case _ => notFoundResponse(response)
+    }
+  }
 
-     def respond[A](messageObj: A, response: HttpServerResponse[ByteBuf])(implicit codec: Codec[A]): rx.Observable[Void] = {
-         val message = Serializer.serialize(messageObj)
-         response.setStatus(HttpResponseStatus.OK)
-         val content: ByteBuf =
-             response.getAllocator
-             .buffer(message.getBytes.length)
-             .writeBytes(message.getBytes)
-         val headers = response.getHeaders
-         headers.set(HttpHeaderNames.CONTENT_LENGTH, message.getBytes.length)
-         headers.set(HttpHeaderNames.CONTENT_TYPE, "application/json")
-         response.write(content)
-         response.close(true)
-     }
+  def respond[A](messageObj: A, response: HttpServerResponse[ByteBuf])(implicit codec: Codec[A]): rx.Observable[Void] = {
+    val message = Serializer.serialize(messageObj)
+    response.setStatus(HttpResponseStatus.OK)
+    val content: ByteBuf =
+    response.getAllocator
+      .buffer(message.getBytes.length)
+      .writeBytes(message.getBytes)
+    val headers = response.getHeaders
+    headers.set(HttpHeaderNames.CONTENT_LENGTH, message.getBytes.length)
+    headers.set(HttpHeaderNames.CONTENT_TYPE, "application/json")
+    response.write(content)
+    response.close(true)
+  }
 
-     def badRequest(response: HttpServerResponse[ByteBuf]) = {
-       response.setStatus(HttpResponseStatus.BAD_REQUEST)
-       response.writeString("Bad request")
-       response.close(true)
-     }
+  def badRequest(response: HttpServerResponse[ByteBuf]): rx.Observable[Void] =
+    stringResponse(response, HttpResponseStatus.BAD_REQUEST, "Bad request")
 
-     def notFoundResponse(response: HttpServerResponse[ByteBuf]) = {
-       response.setStatus(HttpResponseStatus.NOT_FOUND)
-       response.writeString("Service not found")
-       response.close(true)
-     }
+  def notFoundResponse(response: HttpServerResponse[ByteBuf]): rx.Observable[Void] =
+    stringResponse(response, HttpResponseStatus.NOT_FOUND, "Service not found")
 
+  def stringResponse(response: HttpServerResponse[ByteBuf], status: HttpResponseStatus, message: String): rx.Observable[Void] = {
+    response.setStatus(status)
+    response.writeString(message)
+    response.close(true)
+  }
 }
 {{/operations}}
-
-object {{classname}}Router {
-  def createService(api: {{classname}}): Service = Service(new {{classname}}Router(api))
-}

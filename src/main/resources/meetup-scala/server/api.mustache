@@ -11,11 +11,10 @@ trait {{classname}} {
    * {{.}}{{/summary}}{{#notes}}
    *
    * {{.}}{{/notes}}
-{{#hasParams}}
-   *{{/hasParams}}{{#queryParams}}
-   * @param {{paramName}} {{description}}{{/queryParams}}
+   *{{#allParams}}
+   * @param {{paramName}} {{description}}{{/allParams}}
    */
-  def {{operationId}}({{#bodyParams}}{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}}, {{/bodyParams}}{{#formParams}}{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}}, {{/formParams}}{{#pathParams}}{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}}, {{/pathParams}}{{#queryParams}}{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}}, {{/queryParams}}): {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}
+  def {{operationId}}({{#allParams}}{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}
 
   {{/operation}}
 }{{/operations}}
