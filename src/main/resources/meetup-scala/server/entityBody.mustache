@@ -1,58 +1,14 @@
 /* TODO entity body */
-val body: rx.Observable[ByteBuf] = request.getContent.getContent
+val body: rx.Observable[ByteBuf] = request.getContent
 
 body.flatMap {
   new Func1[ByteBuf, rx.Observable[Void]]() {
     override def call(bodyByteBuf: ByteBuf): rx.Observable[Void] = {
-{{#hasBodyParam}}
+{{#allParams}}{{#isBodyParam}}
       val json = bodyByteBuf.toString(Charset.defaultCharset())
-      val deserialized: Either[String, {{dataType}}] = Serializer.deserialize[{{dataType}}](json)
-      deserialized match {
-        case Right(content) =>
-          val result:{{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}({{#pathParams}}{{paramName}}.to{{dataType}},{{/pathParams}}content)
-          val r: JObservable[Void] = respond(result, response)
-          r
-
-        case Left(msg) =>
-          badRequest(response)
-      }
-    }
-{{/hasBodyParam}}
-{{^hasBodyParam}}
-    /* We can't get the underlying netty request, but we can reconstruct
-    enough of it to pass to netty's provided decoder. */
-    val nettyRequest =
-      new DefaultHttpRequest(
-        request.getHttpVersion,
-        request.getHttpMethod,
-        request.getUri)
-
-    /* Now add the headers. */
-    {
-      val i = request.getHeaders.entries().iterator()
-      while (i.hasNext) {
-        val h = i.next()
-        nettyRequest.headers().add(h.getKey, h.getValue)
-      }
-    }
-
-    val content = new DefaultHttpContent(bodyByteBuf)
-    val decoder = new HttpPostRequestDecoder(nettyRequest)
-    val x = decoder.offer(content)
-
-    val hm = scala.collection.mutable.HashMap.empty[String, List[String]]
-
-    decoder.offer(LastHttpContent.EMPTY_LAST_CONTENT)
-    val i = x.getBodyHttpDatas.iterator()
-    while (i.hasNext) {
-      i.next() match {
-        case a: Attribute =>
-          val values = hm.getOrElse(a.getName, List.empty)
-          hm.put(a.getName, a.getValue :: values)
-
-        case _ =>
-      }
-    }
-    decoder.cleanFiles()
-    val param_form = hm.toMap
-{{/hasBodyParam}}
+      val param_{{paramName}}: {{dataType}} =
+        Serializer.deserialize[{{dataType}}](json) match {
+          case Right(content) => content
+          case Left(msg) => sys.error(s"Failed to deserialize body: $msg")
+        }
+{{/isBodyParam}}{{/allParams}}

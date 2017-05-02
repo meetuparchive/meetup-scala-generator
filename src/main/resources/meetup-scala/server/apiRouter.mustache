@@ -26,6 +26,7 @@ class {{classname}}TestRouter(api: {{classname}}) {
         {{#hasBodyParam}}{{>server/entityBody}}{{/hasBodyParam}}{{#hasFormParams}}{{>server/entityBody}}{{/hasFormParams}}
 
         /* (non-entity params) */
+
         {{#hasQueryParams}}val queryParams = request.getQueryParameters{{/hasQueryParams}}
         {{#allParams}}
         {{#isPathParam}}/* path param: {{paramName}} */
@@ -36,9 +37,10 @@ class {{classname}}TestRouter(api: {{classname}}) {
 
         val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}({{#allParams}}param_{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
         respond(result, response)
+
         /* (end non-entity params) */
 
-        {{#hasBodyParam}} }} {{/hasBodyParam}}{{#hasFormParams}} }} {{/hasFormParams}}
+        {{#hasBodyParam}} }}} {{/hasBodyParam}}{{#hasFormParams}} }}} {{/hasFormParams}}
 {{/operation}}
       case _ => notFoundResponse(response)
     }
