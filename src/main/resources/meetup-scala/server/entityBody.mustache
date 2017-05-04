@@ -1,4 +1,3 @@
-/* TODO entity body */
 val body: rx.Observable[ByteBuf] = request.getContent
 
 body.flatMap {
@@ -11,4 +10,6 @@ body.flatMap {
           case Right(content) => content
           case Left(msg) => sys.error(s"Failed to deserialize body: $msg")
         }
-{{/isBodyParam}}{{/allParams}}
+{{/isBodyParam}}{{/allParams}}{{#hasFormParams}}
+    val param_form = Util.getFormParameters(bodyByteBuf, request)
+{{/hasFormParams}}

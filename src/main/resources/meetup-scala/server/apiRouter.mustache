@@ -33,6 +33,8 @@ class {{classname}}TestRouter(api: {{classname}}) {
         val param_{{paramName}}: {{dataType}} = {{paramName}}.to{{dataType}}{{/isPathParam}}
         {{#isQueryParam}}/* query param: {{paramName}} */
         val param_{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}} = {{^required}}Option({{/required}}queryParams.get("{{paramName}}"){{^required}}).map(_{{/required}}.get(0).to{{dataType}}{{^required}}){{/required}}{{/isQueryParam}}
+        {{#isFormParam}}/* form param: {{paramName}} */
+        val param_{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}} = {{^required}}Option({{/required}}param_form.get("{{paramName}}"){{^required}}).map(_{{/required}}.get(0).to{{dataType}}{{^required}}){{/required}}{{/isFormParam}}
         {{/allParams}}
 
         val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}({{#allParams}}param_{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
