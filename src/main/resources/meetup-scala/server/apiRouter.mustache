@@ -16,7 +16,7 @@ import java.nio.charset.Charset
 import rx.functions.Func1
 import rx.{Observable => JObservable}
 
-class {{classname}}TestRouter(api: {{classname}}) {
+class {{classname}}Router(api: {{classname}}) extends Router(api) {
   def handleRequest(request: HttpServerRequest[ByteBuf], response: HttpServerResponse[ByteBuf]): rx.Observable[Void] = {
     val path = request.getPath.split("/").toList.drop(1)
     val method = request.getHttpMethod.name().toUpperCase()
@@ -24,8 +24,6 @@ class {{classname}}TestRouter(api: {{classname}}) {
     (path, method) match { {{#operation}}
       case ({{{vendorExtensions.x-meetup-scala-op-case}}} :: Nil, "{{httpMethod}}") =>
         {{#hasBodyParam}}{{>server/entityBody}}{{/hasBodyParam}}{{#hasFormParams}}{{>server/entityBody}}{{/hasFormParams}}
-
-        /* (non-entity params) */
 
         {{#hasQueryParams}}val queryParams = request.getQueryParameters{{/hasQueryParams}}
         {{#allParams}}
@@ -39,8 +37,6 @@ class {{classname}}TestRouter(api: {{classname}}) {
 
         val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}({{#allParams}}param_{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
         respond(result, response)
-
-        /* (end non-entity params) */
 
         {{#hasBodyParam}} }}} {{/hasBodyParam}}{{#hasFormParams}} }}} {{/hasFormParams}}
 {{/operation}}
@@ -75,3 +71,7 @@ class {{classname}}TestRouter(api: {{classname}}) {
   }
 }
 {{/operations}}
+
+object {{classname}}Router {
+  def createService(api: {{classname}}): Service = Service(new {{classname}}Router(api))
+}
