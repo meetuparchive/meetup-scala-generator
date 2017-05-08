@@ -12,9 +12,10 @@ object Util {
   /**
     * Decode form parameters (URL-encoded name/value pairs) from an entity body.
     * @param request
-    * @return An observable of the parameters.
+    * @param bodyByteBuf
+    * @return The decoded parameters.
     */
-  def getFormParameters(request: HttpServerRequest[ByteBuf]): Observable[Map[String, List[String]]] = {
+  def getFormParameters(bodyByteBuf: ByteBuf, request: HttpServerRequest[ByteBuf]): Map[String, List[String]] = {
     /* We can't get the underlying netty request, but we can reconstruct
        enough of it to pass to netty's provided decoder. */
     val nettyRequest =
@@ -32,32 +33,25 @@ object Util {
       }
     }
 
-    /* Finally we can extract and decode the body. */
-    request
-      .getContent
-      .map(
-        new Func1[ByteBuf, Map[String, List[String]]] {
-          override def call(t: ByteBuf): Map[String, List[String]] = {
-            val content = new DefaultHttpContent(t)
-            val decoder = new HttpPostRequestDecoder(nettyRequest)
-            val x = decoder.offer(content)
+    /* Finally we can decode the body. */
+    val content = new DefaultHttpContent(bodyByteBuf)
+    val decoder = new HttpPostRequestDecoder(nettyRequest)
+    val x = decoder.offer(content)
 
-            val hm = scala.collection.mutable.HashMap.empty[String, List[String]]
+    val hm = scala.collection.mutable.HashMap.empty[String, List[String]]
 
-            decoder.offer(LastHttpContent.EMPTY_LAST_CONTENT)
-            val i = x.getBodyHttpDatas.iterator()
-            while (i.hasNext) {
-              i.next() match {
-                case a: Attribute =>
-                  val values = hm.getOrElse(a.getName, List.empty)
-                  hm.put(a.getName, a.getValue :: values)
+    decoder.offer(LastHttpContent.EMPTY_LAST_CONTENT)
+    val i = x.getBodyHttpDatas.iterator()
+    while (i.hasNext) {
+      i.next() match {
+        case a: Attribute =>
+          val values = hm.getOrElse(a.getName, List.empty)
+          hm.put(a.getName, a.getValue :: values)
 
-                case xx =>
-              }
-            }
-            decoder.cleanFiles()
-            hm.toMap
-          }
-        })
+        case xx =>
+      }
+    }
+    decoder.cleanFiles()
+    hm.toMap
   }
 }

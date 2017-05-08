@@ -1,0 +1,15 @@
+val body: rx.Observable[ByteBuf] = request.getContent
+
+body.flatMap {
+  new Func1[ByteBuf, rx.Observable[Void]]() {
+    override def call(bodyByteBuf: ByteBuf): rx.Observable[Void] = {
+{{#allParams}}{{#isBodyParam}}
+      val json = bodyByteBuf.toString(Charset.defaultCharset())
+      val param_{{paramName}}: {{dataType}} =
+        Serializer.deserialize[{{dataType}}](json) match {
+          case Right(content) => content
+          case Left(msg) => sys.error(s"Failed to deserialize body: $msg")
+        }
+{{/isBodyParam}}{{/allParams}}{{#hasFormParams}}
+    val param_form = Util.getFormParameters(bodyByteBuf, request)
+{{/hasFormParams}}

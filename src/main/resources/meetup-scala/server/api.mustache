@@ -4,8 +4,17 @@ package {{package}}
 {{/imports}}
 
 trait {{classname}} {
-    {{#operation}}
-    def {{operationId}}({{#allParams}}{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}
-    {{/operation}}
-}
-{{/operations}}
+  {{#operation}}
+  /**
+   * {{operationId}}{{#summary}}
+   *
+   * {{.}}{{/summary}}{{#notes}}
+   *
+   * {{.}}{{/notes}}
+   *{{#allParams}}
+   * @param {{paramName}} {{description}}{{/allParams}}
+   */
+  def {{operationId}}({{#allParams}}{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}
+
+  {{/operation}}
+}{{/operations}}
