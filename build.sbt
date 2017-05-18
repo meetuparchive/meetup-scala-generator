@@ -22,3 +22,7 @@ libraryDependencies ++= Seq(
 )
 
 initialCommands := "import com.meetup.codegen._"
+
+licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
+
+bintrayOrganization in ThisBuild := Some("meetup")

@@ -11,7 +11,8 @@ cache:
 
 before_install:
   - sudo pip install envtpl
-  - envtpl < .nexuscredential > "$HOME/.ivy2/.credentials"
+  - mkdir "$HOME/.bintray"
+  - envtpl < .credentials > "$HOME/.bintray/.credentials"
   - export CI_BUILD_NUMBER=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $CI_BUILD_NUMBER; else echo "${TRAVIS_BUILD_NUMBER}-SNAPSHOT"; fi)
   - echo "CI_BUILD_NUMBER=${CI_BUILD_NUMBER}"
 
