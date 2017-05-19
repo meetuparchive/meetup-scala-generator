@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/meetup/meetup-scala-generator.svg?token=FbswwsCsDvuHxrWDF4fU&branch=SGT-25_travis_config)](https://travis-ci.com/meetup/meetup-scala-generator)
+[![Build Status](https://travis-ci.org/meetup/meetup-scala-generator.svg?branch=master)](https://travis-ci.org/meetup/meetup-scala-generator)
 
 ## Development
 
@@ -85,7 +85,7 @@ val planResult: Either[String, Plan] = Serializer.deserialize[Plan](planJson)
 There are two things to note here. First, the result type is `Either[String, Plan]` rather than simply `Plan`. This is because
 deserialization can fail, either because the input string is not valid JSON, or it is, but its structure isn't comprehensible
 as a serialized plan. Second, we had to explicitly pass the `Plan` type parameter to the `deserialize` call. At a high-level
-this is because the implementation relies on static, compile-time proof that a `Plan` can be deserialized. 
+this is because the implementation relies on static, compile-time proof that a `Plan` can be deserialized.
 
 `Serializer` is a convenience module that relies on two other components: the `Parser` module functions and the `Codec` instances
 for each model. Let's use those directly to get a sense of what the `Serializer` does:
@@ -156,7 +156,7 @@ object Psp {
     )
 
   val values: Set[Psp] = valueMap.values.toSet
-  
+
   def fromValue(value: String): Option[Psp] = valueMap.get(value)
 }
 ```
@@ -178,7 +178,7 @@ This would result in the following scala code:
 
 ```scala
 final case class Subscription(psp: Option[Subscription.Psp])
- 
+
 object Subscription {
   sealed abstract class Psp(val value: String) extends Product with Serializable
   case object Apple extends Psp("apple")
@@ -190,9 +190,9 @@ object Subscription {
         "apple" -> Apple,
         "stripe" -> Stripe
       )
-    
+
     val values: Set[Psp] = valueMap.values.toSet
-    
+
     def fromValue(value: String): Option[Psp] = valueMap.get(value)
   }
 }
