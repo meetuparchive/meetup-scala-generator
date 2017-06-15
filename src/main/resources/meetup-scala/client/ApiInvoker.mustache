@@ -60,9 +60,15 @@ final class ApiInvoker private (okHttp: OkHttpClient) {
         promise.failure(e)
 
       override def onResponse(call: Call, response: Response): Unit =
-        f(response.body().string()) match {
-          case Left(e) => promise.failure(new RuntimeException(e)) // TODO
-          case Right(a) => promise.success(a)
+        try {
+          f(response.body().string()) match {
+            case Left(e) => promise.failure(e)
+            case Right(a) => promise.success(a)
+          }
+        } catch {
+          case t: Throwable =>
+            promise.failure(t)
+            throw t
         }
       })
     promise.future
