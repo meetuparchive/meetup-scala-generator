@@ -1,145 +1,1809 @@
 swagger: "2.0"
 
-host: "myservice.myservice.mup-prod.mup.zone"
+host: "mugcomm-service.mugcomm.mup-prod.mup.zone:80"
 
 schemes: [ http ]
 
 info:
-  version: "0.0.0"
-  title: Myservice service
+  version: "1.0.0"
+  title: mug comm service
+
+tags:
+  - name: MugComm
+
+definitions:
+
+  Conversation:
+    description: Defines a conversation which is started by a member and lives under a MUG.
+    required:
+      - id
+      - description
+      - creatorId
+      - chapterId
+      - deleted
+      - visible
+      - createTime
+      - modifyTime
+    properties:
+      id:
+        type: string
+      description:
+        type: string
+      creatorId:
+        type: integer
+        format: int32
+      chapterId:
+        type: integer
+        format: int32
+      numComments:
+        type: integer
+        format: int32
+      deleted:
+        type: boolean
+      visible:
+        type: boolean
+      selfFollowed:
+        type: boolean
+      createTime:
+        type: string
+        format: timestamp
+      modifyTime:
+        type: string
+        format: timestamp
+
+
+  ConversationPostParams:
+    required:
+      - description
+      - creatorId
+      - hidden
+    properties:
+      description:
+        type: string
+      creatorId:
+        type: integer
+        format: int32
+      hidden:
+        type: boolean
+      createTime:
+        type: string
+        format: timestamp
+
+  ConversationMappingPostParams:
+    required:
+      - classicId
+      - serviceId
+    properties:
+      classicId:
+        type: string
+      serviceId:
+        type: string
+
+  CommentMappingPostParams:
+      required:
+        - classicConversationId
+        - classicCommentId
+        - serviceConversationId
+        - serviceCommentId
+      properties:
+        classicConversationId:
+          type: string
+        classicCommentId:
+          type: string
+        serviceConversationId:
+          type: string
+        serviceCommentId:
+          type: string
+
+  ConversationComment:
+    description: A comment made on a conversation
+    required:
+     - id
+     - conversationId
+     - commentorId
+     - content
+     - deleted
+     - visible
+     - createTime
+     - modifyTime
+    properties:
+     id:
+       type: string
+     conversationId:
+       type: string
+     commentorId:
+       type: integer
+     content:
+       type: string
+     numLikes:
+       type: integer
+       format: int32
+     deleted:
+       type: boolean
+     visible:
+       type: boolean
+     selfLiked:
+       type: boolean
+     createTime:
+       type: string
+       format: timestamp
+     modifyTime:
+       type: string
+       format: timestamp
+
+  ConversationCommentPostParams:
+    required:
+      - commentorId
+      - content
+    properties:
+      commentorId:
+        type: integer
+        format: int32
+      content:
+        type: string
+      hidden:
+        type: boolean
+      createTime:
+        type: string
+        format: timestamp
+
+  TimePostParams:
+    properties:
+      time:
+        type: string
+        format: timestamp
+
+  ConversationSubscription:
+    description: A user can subscribe to a conversation to receieve notifications about it.
+    required:
+      - conversationId
+      - subscriberId
+      - deleted
+      - visible
+    properties:
+      conversationId:
+        type: string
+      subscriberId:
+        type: integer
+        format: int32
+      deleted:
+        type: boolean
+      visible:
+        type: boolean
+
+  ConversationAnnounceNotif:
+    description: Contains the data that's needed to create a Conversation announce notif if one should be sent
+    required:
+      - creatorId
+      - conversationId
+      - chapterId
+    properties:
+      creatorId:
+        type: integer
+        format: int32
+      conversationId:
+        type: string
+      chapterId:
+        type: integer
+        format: int32
+
+  ConversationCommentNotif:
+    description: Contains the data that's needed to create a Conversation comment notif if one should be sent
+    required:
+      - commenterId
+      - conversationId
+      - chapterId
+      - commentId
+    properties:
+      commenterId:
+        type: integer
+        format: int32
+      conversationId:
+        type: string
+      chapterId:
+        type: integer
+        format: int32
+      commentId:
+        type: string
+
+  ConversationCommentLikeNotif:
+    description: Contains the data that's needed to create a comment like notif if one should be sent
+    required:
+      - likerId
+      - conversationId
+      - chapterId
+      - commentId
+      - commenterId
+    properties:
+      likerId:
+        type: integer
+        format: int32
+      conversationId:
+        type: string
+      chapterId:
+        type: integer
+        format: int32
+      commentId:
+        type: string
+      commenterId:
+        type: integer
+        format: int32
+
+  ConversationInviteNotif:
+    description: Contains the data needed to create a conversation invite notif if one should be sent
+    required:
+      - inviteeId
+      - conversationId
+      - chapterId
+      - inviterId
+    properties:
+      inviteeId:
+        type: integer
+        format: int32
+      conversationId:
+        type: string
+      chapterId:
+        type: integer
+        format: int32
+      inviterId:
+        type: integer
+        format: int32
+
+  ConversationMapping:
+    description: Mapping of a classic conversation id and a service conversation id
+    required:
+      - classicId
+      - serviceId
+    properties:
+      classicId:
+        type: string
+      serviceId:
+        type: string
+
+  CommentMapping:
+    description: Mapping of a classic comment id and a service comment id
+    required:
+      - classicConversationId
+      - classicCommentId
+      - serviceConversationId
+      - serviceCommentId
+    properties:
+      classicConversationId:
+        type: string
+      classicCommentId:
+        type: string
+      serviceConversationId:
+        type: string
+      serviceCommentId:
+        type: string
+
+  ResponseIntList:
+    description: Api response object for a list of ints
+    properties:
+      ints:
+        type: array
+        items:
+          type: integer
+          format: int32
+      error:
+        $ref: "#/definitions/ApiError"
+
+  ResponseConversation:
+    description: Api response object for a conversation
+    properties:
+      conversation:
+        $ref: "#/definitions/Conversation"
+      error:
+        $ref: "#/definitions/ApiError"
+
+  ResponseConversationCreate:
+    description: Api response object for a conversation post
+    properties:
+      conversation:
+        $ref: "#/definitions/Conversation"
+      error:
+        $ref: "#/definitions/ApiError"
+      notif:
+        $ref: "#/definitions/ConversationAnnounceNotif"
+
+  ResponseConversationList:
+    description: Api response object for a list of conversations
+    properties:
+      conversations:
+        type: array
+        items:
+          $ref: "#/definitions/Conversation"
+      error:
+        $ref: "#/definitions/ApiError"
+
+
+  ResponseConversationComment:
+    description: Api response object for a conversation comment
+    properties:
+      conversationComment:
+        $ref: "#/definitions/ConversationComment"
+      error:
+        $ref: "#/definitions/ApiError"
+
+  ResponseConversationCommentCreate:
+    description: Api response object for a conversation comment post
+    properties:
+      conversationComment:
+        $ref: "#/definitions/ConversationComment"
+      error:
+        $ref: "#/definitions/ApiError"
+      notif:
+        $ref: "#/definitions/ConversationCommentNotif"
+
+  ResponseConversationCommentList:
+    description: Api response object for a list of conversation comments
+    properties:
+      conversationComments:
+        type: array
+        items:
+          $ref: "#/definitions/ConversationComment"
+      error:
+        $ref: "#/definitions/ApiError"
+
+
+  ResponseCommentLike:
+    description: Api response object for a comment like
+    properties:
+      error:
+        $ref: "#/definitions/ApiError"
+
+  ResponseCommentLikeCreate:
+    description: Api response object for a comment like post
+    properties:
+      notif:
+        $ref: "#/definitions/ConversationCommentLikeNotif"
+      error:
+        $ref: "#/definitions/ApiError"
+
+  ResponseConversationInviteCreate:
+    description: Api response object for a conversation invite post
+    properties:
+      error:
+        $ref: "#/definitions/ApiError"
+      notif:
+        $ref: "#/definitions/ConversationInviteNotif"
+
+  ResponseConversationSubscription:
+    description: Api response object for a conversation subscription
+    properties:
+      conversationSubscription:
+        $ref: "#/definitions/ConversationSubscription"
+      error:
+        $ref: "#/definitions/ApiError"
+
+  ResponseConversationSubscriptionList:
+    description: Api response object for a list of conversation subscriptions
+    properties:
+      conversationSubscriptions:
+        type: array
+        items:
+          $ref: "#/definitions/ConversationSubscription"
+      error:
+        $ref: "#/definitions/ApiError"
+
+  ResponseConversationMappingCreate:
+    description: Api response object for a conversation mapping post
+    properties:
+      mapping:
+        $ref: "#/definitions/ConversationMapping"
+      error:
+        $ref: "#/definitions/ConversationMappingError"
+
+  ResponseCommentMappingCreate:
+    description: Api response object for a comment mapping post
+    properties:
+      mapping:
+        $ref: "#/definitions/CommentMapping"
+      error:
+        $ref: "#/definitions/CommentMappingError"
+
+  ResponseResolvedToServiceConversation:
+    description: Api response object for a GET request for the service conversation id
+    properties:
+      serviceConversationId:
+        type: string
+
+  ResponseResolvedToClassicConversation:
+      description: Api response object for a GET request for the classic conversation id
+      properties:
+        classicConversationId:
+          type: string
+
+  ResponseResolvedToServiceComment:
+      description: Api response object for a GET request for the service conversation and comment ids
+      properties:
+        serviceConversationId:
+          type: string
+        serviceCommentId:
+          type: string
+
+  ResponseResolvedToClassicComment:
+    description: Api response object for a GET request for the classic conversation and comment ids
+    properties:
+      classicConversationId:
+        type: string
+      classicCommentId:
+        type: string
+
+  ApiError:
+    description: Object representing an api error
+    required:
+      - error
+    properties:
+      error:
+        enum:
+          - ConversationDoesNotExist
+          - CommentDoesNotExist
+          - LikeDoesNotExist
+          - SubscriptionDoesNotExist
+          - PermissionError
+          - InvalidLengthMessage
+          - InternalApiError
+
+  ConversationMappingError:
+    description: Object representing failure to create a conversation data store mapping
+    required:
+      - mappingDirection
+      - classicConversationId
+      - serviceConversationId
+    properties:
+      mappingDirection:
+        enum:
+          - toClassic
+          - toService
+          - both
+      classicConversationId:
+        type: string
+      serviceConversationId:
+        type: string
+
+  CommentMappingError:
+      description: Object representing failure to create a comment data store mapping
+      required:
+        - mappingDirection
+        - classicCommentId
+        - serviceCommentId
+      properties:
+        mappingDirection:
+          enum:
+            - toClassic
+            - toService
+            - both
+        classicCommentId:
+          type: string
+        serviceConversationId:
+          type: string
+        serviceCommentId:
+          type: string
 
 paths:
-  /myservice/{id}:
+
+  /communications/{chapterId}/{conversationId}:
     get:
-      description: Fetch the myservice entity by the given id
-      summary: Find pets by ID
-      operationId: myserviceGet
+      operationId: getConversation
+      description: Fetch a conversation for a chapter with an explicit id
+      tags: [MugComm]
       parameters:
-        - name: id
-          in: path
-          description: The id of the myservice entity to fetch
-          required: true
-          type: integer
-          format: int64
-        - name: size
-          description: The size of the myservice entity to fetch
-          in: query
-          type: integer
-          format: int32
-          required: false
-        - name: variation
-          in: query
-          type: string
-          required: true
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation to fetch
+        required: true
+        type: string
+      - name: viewingMemberId
+        in: query
+        description: The member viewing the conversation
+        required: false
+        type: integer
+        format: int32
+      responses:
+          200:
+            description: Successful response
+            schema:
+              title: The conversation
+              $ref: "#/definitions/ResponseConversation"
+
+
+  /communications/{chapterId}:
+    get:
+      operationId: getChapterConversations
+      description: Fetch conversations for a chapter
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: chapter id
+        type: integer
+        format: int32
+        required: true
+      - name: viewingMemberId
+        in: query
+        description: The member viewing the conversation
+        required: false
+        type: integer
+        format: int32
       responses:
         200:
-          description: The corresponding myservice entity
+          description: Successful response
           schema:
-            $ref: "#/definitions/MyserviceEntity"
-        404:
-          description: No such myservice entity exists with the given id
+            title: The list of conversations
+            $ref: "#/definitions/ResponseConversationList"
 
-    delete:
-      operationId: myserviceDelete
-      parameters:
-        - name: id
-          in: path
-          description: The id of the myservice entity to delete
-          required: true
-          type: integer
-          format: int64
-      responses:
-        204:
-          description: Confirmation that the myservice entity was deleted or is in the process of being deleted
-        404:
-          description: No such myservice entity exists with the given id
-
-  /myservice/form/{id}:
     post:
-      description: Create a myservice entity
-      operationId: myservicePost
+      operationId: createConversation
+      description: Create a new conversation
+      tags: [MugComm]
       parameters:
-        - name: id
-          in: path
-          description: The id of the myservice entity to fetch
-          required: true
-          type: integer
-          format: int64
-        - name: size
-          description: The size of the myservice entity to fetch
-          in: query
-          type: integer
-          format: int32
-          required: false
-        - name: variation
-          in: formData
-          type: string
-          required: true
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/ConversationPostParams"
       responses:
         201:
-          description: The newly created myservice entity
+          description: Conversation was created successfully
           schema:
-            $ref: "#/definitions/MyserviceEntity"
+            $ref: "#/definitions/ResponseConversationCreate"
 
-  /myservice/sub/{id}:
-    post:
-      description: Create a myservice entity
-      operationId: myservicePost
-      parameters:
-        - name: id
+  /service/{chapterId}/{classicConversationId}:
+      post:
+        operationId: createConvAndMapping
+        description: Create a new conversation
+        tags: [MugComm]
+        parameters:
+        - name: chapterId
           in: path
-          description: The id of the myservice entity to fetch
+          description: The chapter the conversation is in
           required: true
-          type: integer
-          format: int64
-        - name: size
-          description: The size of the myservice entity to fetch
-          in: query
           type: integer
           format: int32
-          required: false
-        - name: variation
-          in: query
-          type: string
+        - name: classicConversationId
+          in: path
+          description: The classic created id of the conversation
           required: true
+          type: string
         - name: body
           in: body
           required: true
           schema:
-            $ref: "#/definitions/MyserviceEntityCreate"
+            $ref: "#/definitions/ConversationPostParams"
+        responses:
+          201:
+            description: Conversation was created successfully
+            schema:
+              $ref: "#/definitions/ResponseConversationCreate"
+
+  /communications/{chapterId}/{conversationId}/deleter/{deleterMemberId}/deleterIsOrg/{deleterIsOrg}:
+    post:
+      operationId: deleteConversation
+      description: Delete a conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation to delete
+        required: true
+        type: string
+      - name: deleterMemberId
+        in: path
+        description: The member that is deleting the conversation
+        required: true
+        type: integer
+        format: int32
+      - name: deleterIsOrg
+        in: path
+        description: Is the deleter an organizer or a co-organaizer.
+        required: true
+        type: boolean
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        200:
+          description: Conversation was deleted successfully
+          schema:
+            $ref: "#/definitions/ResponseConversation"
+
+  /communications/{chapterId}/{conversationId}/comments:
+    get:
+      operationId: getConversationComments
+      description: Fetch comments for a conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation to fetch
+        required: true
+        type: string
+      - name: viewingMemberId
+        in: query
+        description: The member viewing the conversation
+        required: false
+        type: integer
+        format: int32
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: The list of comments
+            $ref: "#/definitions/ResponseConversationCommentList"
+
+    post:
+      operationId: comment
+      description: Create a new comment
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation to fetch
+        required: true
+        type: string
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/ConversationCommentPostParams"
       responses:
         201:
-          description: The newly created myservice entity
+          description: Comment was created successfully
           schema:
-            $ref: "#/definitions/MyserviceEntity"
+            $ref: "#/definitions/ResponseConversationCommentCreate"
 
-definitions:
-  MyserviceEntity:
-    required:
-      - id
-      - message
-      - created
-      - modified
-    properties:
-      id:
+  /communications/{chapterId}/{conversationId}/comments/{commentId}:
+    get:
+      operationId: getConversationComment
+      description: fetch a single comment (should currently only be used by notifs logic, no business apis)
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
         type: integer
-        format: int64
-      message:
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation the
+        required: true
         type: string
-      optionalDescription:
+      - name: commentId
+        in: path
+        description: The comment to fetch
+        required: true
         type: string
-      created:
-        type: string
-        format: timestamp
-      modified:
-       type: string
-       format: timestamp
+      responses:
+        200:
+          description: The comment in question
+          schema:
+            $ref: "#/definitions/ResponseConversationComment"
 
-  MyserviceEntityCreate:
-    required:
-      - message
-    properties:
-      message:
+  /communications/{chapterId}/{conversationId}/comments/{commentId}/deleter/{deleterMemberId}/deleterIsOrg/{deleterIsOrg}:
+    post:
+      operationId: deleteConversationComment
+      description: Delete a comment
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation the comment is in
+        required: true
         type: string
-      description:
+      - name: commentId
+        in: path
+        description: The comment to delete
+        required: true
         type: string
+      - name: deleterMemberId
+        in: path
+        description: The member that is deleting the comment
+        required: true
+        type: integer
+        format: int32
+      - name: deleterIsOrg
+        in: path
+        description: whether the deleting member is an org (implying we don't need to check deleter against content creator)
+        required: true
+        type: boolean
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        200:
+          description: comment was deleted successfully
+          schema:
+            $ref: "#/definitions/ResponseConversationComment"
+
+  /communications/{chapterId}/{conversationId}/comments/{commentId}/likes/member/{memberId}:
+    post:
+      operationId: like
+      description: Like a comment
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The id of the chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The id of the conversation the comment is in
+        required: true
+        type: string
+      - name: commentId
+        in: path
+        description: The id of the comment to like
+        required: true
+        type: string
+      - name: memberId
+        in: path
+        description: The id of the member liking the comment
+        required: true
+        type: integer
+        format: int32
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        201:
+          description: Comment was liked succesfully
+          schema:
+            $ref: "#/definitions/ResponseCommentLikeCreate"
+
+    delete:
+      operationId: unlike
+      description: Unlike a comment
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The id of the chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The id of the conversation the comment is in
+        required: true
+        type: string
+      - name: commentId
+        in: path
+        description: The id of the comment to unlike
+        required: true
+        type: string
+      - name: memberId
+        in: path
+        description: The id of the member unliking the comment
+        required: true
+        type: integer
+        format: int32
+      responses:
+        200:
+          description: Comment was unliked succesfully
+          schema:
+            $ref: "#/definitions/ResponseCommentLike"
+
+  /communications/{chapterId}/{conversationId}/comments/{commentId}/likes:
+    get:
+      operationId: getCommentLikers
+      description: Fetch likes on a comment
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation that members are subscribed to
+        required: true
+        type: string
+      - name: commentId
+        in: path
+        description: The conversation that members are subscribed to
+        required: true
+        type: string
+      responses:
+        200:
+          description: List of likers on that comment
+          schema:
+            title: The list of liker ids
+            $ref: "#/definitions/ResponseIntList"
+
+  /communications/{chapterId}/{conversationId}/subscriptions:
+    get:
+      operationId: getConversationSubscribers
+      description: Fetch members subscriptions to a conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation that members are subscribed to
+        required: true
+        type: string
+      - name: includeUnfollowed
+        in: query
+        description: Whether to include unfollowed subscriptions
+        required: true
+        type: boolean
+      - name: viewingMemberId
+        in: query
+        description: The member viewing the subscriptions
+        required: false
+        type: integer
+        format: int32
+      responses:
+        200:
+          description: The list of of subscriptions
+          schema:
+            $ref: "#/definitions/ResponseConversationSubscriptionList"
+
+
+  /communications/{chapterId}/{conversationId}/subscriptions/{subscriberId}:
+    post:
+      operationId: follow
+      description: Member folllows a conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+      - name: conversationId
+        in: path
+        description: The conversation that members are subscribing to
+        required: true
+        type: string
+      - name: subscriberId
+        in: path
+        required: true
+        type: integer
+        format: int32
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        200:
+          description: The created subscription
+          schema:
+            $ref: "#/definitions/ResponseConversationSubscription"
+
+
+  /communications/{chapterId}/{conversationId}/subscriptions/{subscriberId}/unfollow:
+    post:
+      operationId: unfollow
+      description: Member unfollows a conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+      - name: conversationId
+        in: path
+        description: The conversation that members are subscribed to
+        required: true
+        type: string
+      - name: subscriberId
+        in: path
+        required: true
+        type: integer
+        format: int32
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        200:
+          description: The deleted subscription
+          schema:
+            $ref: "#/definitions/ResponseConversationSubscription"
+
+
+  # We set this HTTP verb to GET as a workaround for this issue:
+  # https://meetup.atlassian.net/browse/CMM-102
+  /communications/{chapterId}/{conversationId}/invites/{inviterId}/{inviteeId}:
+    get:
+      operationId: invite
+      description: Invites a member to the conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation that members are subscribed to
+        required: true
+        type: string
+      - name: inviterId
+        description: Member making the invitation
+        in: path
+        required: true
+        type: integer
+        format: int32
+      - name: inviteeId
+        description: Member receiving the invitation
+        in: path
+        required: true
+        type: integer
+        format: int32
+      responses:
+        202:
+          description: Invitation was successful
+          schema:
+            $ref: "#/definitions/ResponseConversationInviteCreate"
+
+  /admin/chapter/{chapterId}:
+    get:
+      operationId: adminGetConversations
+      description: gets *all* conversations for this chapter (even deleted and hidden ones)
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        required: true
+        description: the chapter to get the conversations for
+        type: integer
+        format: int32
+      responses:
+        200:
+          description: The list of conversations
+          schema:
+            $ref: "#/definitions/ResponseConversationList"
+
+  /admin/conversation/{conversationId}:
+    get:
+      operationId: adminGetConversation
+      description: get single conversation
+      tags: [MugComm]
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        description: the id of the conversation to get
+        type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/ResponseConversation"
+
+  /admin/conversation/{conversationId}/delete:
+    post:
+      operationId: adminDeleteConversation
+      description: Delete a conversation
+      tags: [MugComm]
+      parameters:
+      - name: conversationId
+        in: path
+        description: The conversation to delete
+        required: true
+        type: string
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        200:
+          description: Conversation was deleted successfully
+          schema:
+            $ref: "#/definitions/ResponseConversation"
+
+  /admin/conversation/{conversationId}/undelete:
+    post:
+      operationId: adminUndeleteConversation
+      description: Undelete a conversation
+      tags: [MugComm]
+      parameters:
+      - name: conversationId
+        in: path
+        description: The conversation to undelete
+        required: true
+        type: string
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        200:
+          description: Conversation was undeleted successfully
+          schema:
+            $ref: "#/definitions/ResponseConversation"
+
+  /admin/conversation/{conversationId}/comments:
+    get:
+      operationId: adminGetConversationComments
+      description: get comments for conversation
+      tags: [MugComm]
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        description: the id of the conversation to get comments for
+        type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/ResponseConversationCommentList"
+
+  /admin/conversation/{conversationId}/comments/{commentId}:
+    get:
+      operationId: adminGetConversationComment
+      description: get comment for conversation
+      tags: [MugComm]
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        description: the id of the conversation
+        type: string 
+      - name: commentId
+        in: path
+        required: true
+        description: the id of the comment to get
+        type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/ResponseConversationComment"
+
+  /admin/conversation/{conversationId}/comments/{commentId}/delete:
+    post:
+      operationId: adminDeleteComment
+      description: Delete a comment
+      tags: [MugComm]
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        description: the id of the conversation
+        type: string 
+      - name: commentId
+        in: path
+        description: The comment to delete
+        required: true
+        type: string
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        200:
+          description: Comment was deleted successfully
+          schema:
+            $ref: "#/definitions/ResponseConversationComment"
+
+  /admin/conversation/{conversationId}/comments/{commentId}/undelete:
+    post:
+      operationId: adminUndeleteComment
+      description: Undelete a comment
+      tags: [MugComm]
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        description: the id of the conversation
+        type: string 
+      - name: commentId
+        in: path
+        description: The comment to undelete
+        required: true
+        type: string
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        200:
+          description: Comment was undeleted successfully
+          schema:
+            $ref: "#/definitions/ResponseConversationComment"
+
+  /mapping/conversation:
+    post:
+      operationId: createConversationMapping
+      description: create a conversation id mapping
+      tags: [MugComm]
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/ConversationMappingPostParams"
+      responses:
+        201:
+          description: Conversation mapping was created succesfully
+          schema:
+            $ref: "#/definitions/ResponseConversationMappingCreate"
+
+  /mapping/comment:
+    post:
+      operationId: createCommentMapping
+      description: create a comment id mapping
+      tags: [MugComm]
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/CommentMappingPostParams"
+      responses:
+        201:
+          description: Comment mapping was created succesfully
+          schema:
+            $ref: "#/definitions/ResponseCommentMappingCreate"
+
+  /mapping/service/conversation/{classicConversationId}:
+    get:
+      operationId: getServiceConversationId
+      description: get the service id for a conversation
+      tags: [MugComm]
+      parameters:
+      - name: classicConversationId
+        in: path
+        required: true
+        description: the classic id of the conversation
+        type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/ResponseResolvedToServiceConversation"
+
+  /mapping/classic/conversation/{serviceConversationId}:
+    get:
+      operationId: getClassicConversationId
+      description: get the classic id for a conversation
+      tags: [MugComm]
+      parameters:
+      - name: serviceConversationId
+        in: path
+        required: true
+        description: the service id of the conversation
+        type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/ResponseResolvedToClassicConversation"
+
+  /mapping/service/conversationAndComment/{classicCommentId}:
+    get:
+      operationId: getServiceConvAndCommentIds
+      description: get the service id for a comment as well as the service id for the conversation it is a part of
+      tags: [MugComm]
+      parameters:
+      - name: classicCommentId
+        in: path
+        required: true
+        description: the classic id of the comment
+        type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/ResponseResolvedToServiceComment"
+
+  /mapping/classic/conversationAndComment/{serviceConversationId}/{serviceCommentId}:
+    get:
+      operationId: getClassicConvAndCommentIds
+      description: get the classic id for a comment as well as the classic id for the conversation it belongs to
+      tags: [MugComm]
+      parameters:
+      - name: serviceConversationId
+        in: path
+        required: true
+        description: the service id of the conversation that the comment is a part of
+        type: string
+      - name: serviceCommentId
+        in: path
+        required: true
+        description: the service id of the comment
+        type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/ResponseResolvedToClassicComment"
+
+  /error:
+    get:
+      operationId: logError
+      description: logs an error message to test alerting
+      tags: [MugComm]
+      parameters:
+      - name: message
+        in: query
+        type: string
+      responses:
+        204:
+          description: error message has been logged
+
+  /ping:
+    get:
+      description: ping server to check if it's up
+      operationId: ping
+      tags: [MugComm]
+      responses:
+        200:
+          description: pong response, indicating server is up
+          schema:
+            title: status
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+  /preStop:
+    get:
+      description: endpoint used to inform the server it's about to be shut down
+      operationId: preStop
+      tags: [MugComm]
+      responses:
+        204:
+         description: server is aware it's about to be shut down
+
+  /classic/{chapterId}/{conversationId}:
+    get:
+      operationId: classicGetConversation
+      description: Fetch a conversation for a chapter with an explicit id
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation to fetch
+        required: true
+        type: string
+      - name: viewingMemberId
+        in: query
+        description: The member viewing the conversation
+        required: false
+        type: integer
+        format: int32
+      responses:
+          200:
+            description: Successful response
+            schema:
+              title: The conversation
+              $ref: "#/definitions/ResponseConversation"
+
+    post:
+      operationId: classicCreateConversation
+      description: Create a new conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The classic created id of the conversation
+        required: true
+        type: string
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/ConversationPostParams"
+      responses:
+        201:
+          description: Conversation was created successfully
+          schema:
+            $ref: "#/definitions/ResponseConversationCreate"
+
+  /classic/{chapterId}:
+    get:
+      operationId: classicGetChapterConversations
+      description: Fetch conversations for a chapter
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: chapter id
+        type: integer
+        format: int32
+        required: true
+      - name: viewingMemberId
+        in: query
+        description: The member viewing the conversation
+        required: false
+        type: integer
+        format: int32
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: The list of conversations
+            $ref: "#/definitions/ResponseConversationList"
+
+  /classic/{chapterId}/{conversationId}/deleter/{deleterMemberId}/deleterIsOrg/{deleterIsOrg}:
+    post:
+      operationId: classicDeleteConversation
+      description: Delete a conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation to delete
+        required: true
+        type: string
+      - name: deleterMemberId
+        in: path
+        description: The member that is deleting the conversation
+        required: true
+        type: integer
+        format: int32
+      - name: deleterIsOrg
+        in: path
+        description: Is the deleter an organizer or a co-organaizer.
+        required: true
+        type: boolean
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        200:
+          description: Conversation was deleted successfully
+          schema:
+            $ref: "#/definitions/ResponseConversation"
+
+  /classic/{chapterId}/{conversationId}/comments:
+    get:
+      operationId: classicGetConversationComments
+      description: Fetch comments for a conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation to fetch
+        required: true
+        type: string
+      - name: viewingMemberId
+        in: query
+        description: The member viewing the conversation
+        required: false
+        type: integer
+        format: int32
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: The list of comments
+            $ref: "#/definitions/ResponseConversationCommentList"
+
+  /classic/{chapterId}/{conversationId}/comments/{commentId}:
+    get:
+      operationId: classicGetConversationComment
+      description: fetch a single comment (should currently only be used by notifs logic, no business apis)
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation the
+        required: true
+        type: string
+      - name: commentId
+        in: path
+        description: The comment to fetch
+        required: true
+        type: string
+      responses:
+        200:
+          description: The comment in question
+          schema:
+            $ref: "#/definitions/ResponseConversationComment"
+
+    post:
+      operationId: classicComment
+      description: Create a new comment
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation to fetch
+        required: true
+        type: string
+      - name: commentId
+        in: path
+        description: The classic id of the created comment
+        required: true
+        type: string
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/ConversationCommentPostParams"
+      responses:
+        201:
+          description: Comment was created successfully
+          schema:
+            $ref: "#/definitions/ResponseConversationCommentCreate"
+
+  /classic/{chapterId}/{conversationId}/comments/{commentId}/deleter/{deleterMemberId}/deleterIsOrg/{deleterIsOrg}:
+    post:
+      operationId: classicDeleteConversationComment
+      description: Delete a comment
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation the comment is in
+        required: true
+        type: string
+      - name: commentId
+        in: path
+        description: The comment to delete
+        required: true
+        type: string
+      - name: deleterMemberId
+        in: path
+        description: The member that is deleting the comment
+        required: true
+        type: integer
+        format: int32
+      - name: deleterIsOrg
+        in: path
+        description: whether the deleting member is an org (implying we don't need to check deleter against content creator)
+        required: true
+        type: boolean
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        200:
+          description: comment was deleted successfully
+          schema:
+            $ref: "#/definitions/ResponseConversationComment"
+
+  /classic/{chapterId}/{conversationId}/comments/{commentId}/likes/member/{memberId}:
+    post:
+      operationId: classicLike
+      description: Like a comment
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The id of the chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The id of the conversation the comment is in
+        required: true
+        type: string
+      - name: commentId
+        in: path
+        description: The id of the comment to like
+        required: true
+        type: string
+      - name: memberId
+        in: path
+        description: The id of the member liking the comment
+        required: true
+        type: integer
+        format: int32
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        201:
+          description: Comment was liked succesfully
+          schema:
+            $ref: "#/definitions/ResponseCommentLikeCreate"
+
+    delete:
+      operationId: classicUnlike
+      description: Unlike a comment
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The id of the chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The id of the conversation the comment is in
+        required: true
+        type: string
+      - name: commentId
+        in: path
+        description: The id of the comment to unlike
+        required: true
+        type: string
+      - name: memberId
+        in: path
+        description: The id of the member unliking the comment
+        required: true
+        type: integer
+        format: int32
+      responses:
+        200:
+          description: Comment was unliked succesfully
+          schema:
+            $ref: "#/definitions/ResponseCommentLike"
+
+  /classic/{chapterId}/{conversationId}/comments/{commentId}/likes:
+    get:
+      operationId: classicGetCommentLikers
+      description: Fetch likes on a comment
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation that members are subscribed to
+        required: true
+        type: string
+      - name: commentId
+        in: path
+        description: The conversation that members are subscribed to
+        required: true
+        type: string
+      responses:
+        200:
+          description: List of likers on that comment
+          schema:
+            title: The list of liker ids
+            $ref: "#/definitions/ResponseIntList"
+
+  /classic/{chapterId}/{conversationId}/subscriptions:
+    get:
+      operationId: classicGetConversationSubscribers
+      description: Fetch members subscriptions to a conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation that members are subscribed to
+        required: true
+        type: string
+      - name: includeUnfollowed
+        in: query
+        description: Whether to include unfollowed subscriptions
+        required: true
+        type: boolean
+      - name: viewingMemberId
+        in: query
+        description: The member viewing the subscriptions
+        required: false
+        type: integer
+        format: int32
+      responses:
+        200:
+          description: The list of of subscriptions
+          schema:
+            $ref: "#/definitions/ResponseConversationSubscriptionList"
+
+
+  /classic/{chapterId}/{conversationId}/subscriptions/{subscriberId}:
+    post:
+      operationId: classicFollow
+      description: Member folllows a conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+      - name: conversationId
+        in: path
+        description: The conversation that members are subscribing to
+        required: true
+        type: string
+      - name: subscriberId
+        in: path
+        required: true
+        type: integer
+        format: int32
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        200:
+          description: The created subscription
+          schema:
+            $ref: "#/definitions/ResponseConversationSubscription"
+
+
+  /classic/{chapterId}/{conversationId}/subscriptions/{subscriberId}/unfollow:
+    post:
+      operationId: classicUnfollow
+      description: Member unfollows a conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+      - name: conversationId
+        in: path
+        description: The conversation that members are subscribed to
+        required: true
+        type: string
+      - name: subscriberId
+        in: path
+        required: true
+        type: integer
+        format: int32
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: "#/definitions/TimePostParams"
+      responses:
+        200:
+          description: The deleted subscription
+          schema:
+            $ref: "#/definitions/ResponseConversationSubscription"
+
+
+  # We set this HTTP verb to GET as a workaround for this issue:
+  # https://meetup.atlassian.net/browse/CMM-102
+  /classic/{chapterId}/{conversationId}/invites/{inviterId}/{inviteeId}:
+    get:
+      operationId: classicInvite
+      description: Invites a member to the conversation
+      tags: [MugComm]
+      parameters:
+      - name: chapterId
+        in: path
+        description: The chapter the conversation is in
+        required: true
+        type: integer
+        format: int32
+      - name: conversationId
+        in: path
+        description: The conversation that members are subscribed to
+        required: true
+        type: string
+      - name: inviterId
+        description: Member making the invitation
+        in: path
+        required: true
+        type: integer
+        format: int32
+      - name: inviteeId
+        description: Member receiving the invitation
+        in: path
+        required: true
+        type: integer
+        format: int32
+      responses:
+        202:
+          description: Invitation was successful
+          schema:
+            $ref: "#/definitions/ResponseConversationInviteCreate"
+

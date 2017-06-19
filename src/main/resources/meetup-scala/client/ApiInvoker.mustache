@@ -8,12 +8,12 @@ import scala.concurrent.Future
 final class ApiInvoker private (okHttp: OkHttpClient) {
   import ApiInvoker.{getRequestBuilder, JsonMediaType}
 
-  def invokeDELETE(baseUrl: String, path: String, queryParams: Map[String, String], form: Map[String, String]): Future[Unit] = {
+  def invokeDELETE[A : Codec](baseUrl: String, path: String, queryParams: Map[String, String], form: Map[String, String]): Future[A] = {
     val req = getRequestBuilder(baseUrl, path, queryParams)
       .delete()
       .build()
 
-    dispatchRequest[Unit](req, { _ => Right(Unit) })
+    dispatchCodecRequest[A](req)
   }
 
   def invokePOST[A : Codec](baseUrl: String, path: String, queryParams: Map[String, String], form: Map[String, String]): Future[A] = {
