@@ -35,7 +35,7 @@ final class {{classname}}(basePath: String, invoker: ApiInvoker) {
     invoker.invoke{{httpMethod}}[{{dataType}}, {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}](basePath, path, queryParams, {{paramName}})
     {{/bodyParam}}
     {{^bodyParam}}
-    invoker.invoke{{httpMethod}}{{#returnType}}[{{returnType}}]{{/returnType}}(basePath, path, queryParams, form)
+    invoker.invoke{{httpMethod}}[{{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}}](basePath, path, queryParams, form)
     {{/bodyParam}}
   }
 {{/operation}}
