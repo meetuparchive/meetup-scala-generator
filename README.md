@@ -115,6 +115,30 @@ an `Either[String, JValue]`, so we use `flatMap` to end up with a "flattened" st
 
 This generator is intended to target API specification files adhering to the [OpenAPI version 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).
 
+### Order of Parameters
+The order in which parameters are defined in the Open Api spec doesn't necessarily correspond to the order in which the method accepts them in the generated code.
+In the generated code, the method accepts required params before optional ones. The following Open Api spec would generate a client with a method like:
+`def getChapterConversations(A: Boolean, D: Boolean, B: Option[Boolean], C: Option[Boolean])`
+```/communications/{chapterId}:
+     get:
+        operationId: getChapterConversations
+        description: Fetch conversations for a chapter
+        tags: [MugCommService]
+        parameters:
+        - name: A
+          type: boolean
+          required: true
+        - name: B
+          type: boolean
+          required: false
+        - name: C
+          type: boolean
+          required: false
+        - name: D
+          type: boolean
+          required: true```
+
+
 ### Treatment of `enum`
 
 The OpenAPI specification defers to the [JSON-Schema Draft 4] for its treatment of [`enum`](http://json-schema.org/latest/json-schema-validation.html#anchor76).
