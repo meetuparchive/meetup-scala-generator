@@ -119,7 +119,8 @@ This generator is intended to target API specification files adhering to the [Op
 The order in which parameters are defined in the Open Api spec doesn't necessarily correspond to the order in which the method accepts them in the generated code.
 In the generated code, the method accepts required params before optional ones. The following Open Api spec would generate a client with a method like:
 `def getChapterConversations(A: Boolean, D: Boolean, B: Option[Boolean], C: Option[Boolean])`
-```/communications/{chapterId}:
+```yaml
+/communications/{chapterId}:
      get:
         operationId: getChapterConversations
         description: Fetch conversations for a chapter
@@ -136,8 +137,8 @@ In the generated code, the method accepts required params before optional ones. 
           required: false
         - name: D
           type: boolean
-          required: true```
-
+          required: true
+```
 
 ### Treatment of `enum`
 
