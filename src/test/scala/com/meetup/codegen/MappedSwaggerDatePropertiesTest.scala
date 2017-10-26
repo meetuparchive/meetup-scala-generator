@@ -20,9 +20,11 @@ class MappedSwaggerDatePropertiesTest extends FunSpec with Matchers {
           codeGen.getSwaggerType(f(from)) shouldBe to
       }
     }
-    it("should map LocalDate type to the import java.time.LocalDate") {
+  }
+
+  describe("the LocalDate type") {
+    it("should map to the import java.time.LocalDate") {
       assert(codeGen.importMapping().get("LocalDate") == "java.time.LocalDate")
     }
   }
-
 }
