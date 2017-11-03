@@ -20,10 +20,12 @@ definitions:
         - aTimestamp
         - aDouble
         - aFloat
-        - anActualInteger
-        - anActualLong
+        - anInteger
+        - aLong
         - anArray
-        - aMap
+        - aMapSimple
+        - aMapOfRefs
+        - aReferenceToAnotherDefinition
       properties:
         aString:
           type: string
@@ -44,20 +46,30 @@ definitions:
         aFloat:
           type: number
           format: float
-        anActualInteger:
+        anInteger:
           type: integer
           format: int32
-        anActualLong:
+        aLong:
           type: integer
           format: int64
         anArray:
           type: array
           items:
             type: string
-        aMap:
+        aMapSimple:
+          type: object
+          additionalProperties:
+            type: string
+        aMapOfRefs:
           type: object
           additionalProperties:
               $ref: '#/definitions/TestMapItem'
+        aReferenceToAnotherDefinition:
+          $ref: '#/definitions/TestMapItem'
+        anOptionString:
+          type: string
+        anOptionRef:
+          $ref: '#/definitions/TestMapItem'
 
   TestMapItem:
     description: A thing to put in the map in TestEntity.  Both this and the TestEntity should be two-way serializable.

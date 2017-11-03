@@ -154,8 +154,41 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
         // special handling for the model's timestamps
         objs = postProcessModelsTimestamp(objs);
 
+        // special handling for the model's $ref entries
+        objs = postProcessModelsRefs(objs);
+
         // Now subject the models to Enum treatment.
         return postProcessModelsEnum(objs);
+    }
+
+    /**
+     * OpenAPI yaml specs support generating objects that refer to other objects, like so:
+     *
+     * aReferenceToAnotherDefinition:
+     *   $ref: '#/definitions/SomeOtherDefinition'
+     *
+     * We want to mark the objects as such, so that we can handle them separately when
+     * auto-generating unit tests.
+     *
+     * @param objs Map of models
+     * @return map of models with "isRef" field set to true for $ref properties
+     */
+    public Map<String, Object> postProcessModelsRefs(Map<String, Object> objs) {
+        @SuppressWarnings("unchecked")
+        List<Map> models = (List<Map>) objs.get("models");
+        for (Map map : models ) {
+            if (map.containsKey("model")) {
+                CodegenModel cm = (CodegenModel) map.get("model");
+                for (CodegenProperty prop : cm.vars) {
+                    // ignore containers. they may contain refs but are not themselves refs.
+                    if (prop.isNotContainer != null && prop.isNotContainer &&
+                            prop.jsonSchema != null && prop.jsonSchema.contains("$ref")) {
+                        prop.vendorExtensions.put("isRef", true);
+                    }
+                }
+            }
+        }
+        return objs;
     }
 
     /**
@@ -176,7 +209,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
      * you'd need to check for "vendorExtensions.isTimestamp".
      *
      * @param objs Map of models
-     * @return map of models with "isTimestamp" field set on timestamp properties
+     * @return map of models with "isTimestamp" field set to true for timestamp properties
      */
     public Map<String, Object> postProcessModelsTimestamp(Map<String, Object> objs) {
         @SuppressWarnings("unchecked")

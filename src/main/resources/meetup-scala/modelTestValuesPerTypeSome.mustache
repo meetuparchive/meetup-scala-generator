@@ -1,0 +1,2 @@
+{{! instantiates all Options as Some(defaultvalue) }}
+{{^required}}Some({{/required}}{{>modelTestValuesPerType}}{{^required}}){{/required}}
