@@ -10,7 +10,7 @@ info:
 
 definitions:
 
-  DanTestEntity:
+  TestEntity:
       description: An entity with every type of property, created here to help test out our two-way serialization testing.
       required:
         - aString
@@ -22,8 +22,8 @@ definitions:
         - aFloat
         - anActualInteger
         - anActualLong
-        - aMap
         - anArray
+        - aMap
       properties:
         aString:
           type: string
@@ -50,17 +50,25 @@ definitions:
         anActualLong:
           type: integer
           format: int64
-        aMap:
-          type: object
-          properties:
-            id:
-              type: string
-            name:
-              type: string
         anArray:
           type: array
           items:
             type: string
+        aMap:
+          type: object
+          additionalProperties:
+              $ref: '#/definitions/TestMapItem'
+
+  TestMapItem:
+    description: A thing to put in the map in TestEntity.  Both this and the TestEntity should be two-way serializable.
+    required:
+      - key
+      - value
+    properties:
+      key:
+        type: string
+      value:
+        type: string
 
 paths:
 
