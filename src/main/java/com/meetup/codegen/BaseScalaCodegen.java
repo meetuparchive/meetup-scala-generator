@@ -21,6 +21,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
 
     private static final String ARG_INCLUDE_SERIALIZATION = "includeSerialization";
     protected String sourceFolder = "src/main/scala";
+    protected String testSourceFolder = "src/main/test";
     protected String invokerPackage = "com.meetup";
     protected String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
 
@@ -139,6 +140,8 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     @Override
     public final Map<String, Object> postProcessModels(Map<String, Object> objs) {
         // import sanitization lifted from ScalaClientCodegen
+        // explicitly removes imports of classes in the same package
+        // including these imports causes warnings
         @SuppressWarnings("unchecked")
         List<Map<String, String>> imports = (List<Map<String, String>>) objs.get("imports");
         final String prefix = modelPackage() + ".";
@@ -148,8 +151,48 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
             if (_import.startsWith(prefix)) iterator.remove();
         }
 
+        // special handling for the model's timestamps
+        objs = postProcessModelsTimestamp(objs);
+
         // Now subject the models to Enum treatment.
         return postProcessModelsEnum(objs);
+    }
+
+    /**
+     * Our OpenAPI yaml specs support generating java.time.Instant properties like so:
+     *
+     * aTimestampProperty:
+     *   type: string
+     *   format: timestamp
+     *
+     * The codegen will interpret this property as a String and, in the model, it will set
+     * a boolean, isString, to true.
+     *
+     * We want the isString property to be false/null, and instead have an isTimestamp property be true.
+     * This is similar to how Dates and DateTimes are handled, except those are done for us by default.
+     *
+     * Unfortunately we cannot add an "isTimestamp" property in the model at the same level as the other
+     * booleans.  Instead, we have to put it in the "vendorExceptions" map.  So to check for timestamps,
+     * you'd need to check for "vendorExtensions.isTimestamp".
+     *
+     * @param objs Map of models
+     * @return map of models with "isTimestamp" field set on timestamp properties
+     */
+    public Map<String, Object> postProcessModelsTimestamp(Map<String, Object> objs) {
+        @SuppressWarnings("unchecked")
+        List<Map> models = (List<Map>) objs.get("models");
+        for (Map map : models ) {
+            if (map.containsKey("model")) {
+                CodegenModel cm = (CodegenModel) map.get("model");
+                for (CodegenProperty prop : cm.vars) {
+                    if (prop.dataFormat != null && prop.dataFormat.equals("timestamp")) {
+                        prop.isString = null; // null instead of false to match the default behavior of the other booleans
+                        prop.vendorExtensions.put("isTimestamp", true);
+                    }
+                }
+            }
+        }
+        return objs;
     }
 
     /**
@@ -178,6 +221,11 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     @Override
     public final String apiFileFolder() {
         return outputFolder + "/" + sourceFolder + "/" + apiPackage().replace('.', File.separatorChar);
+    }
+
+    @Override
+    public final String modelTestFileFolder() {
+        return outputFolder + "/" + testSourceFolder + "/" + testPackage().replace('.', File.separatorChar);
     }
 
     /**

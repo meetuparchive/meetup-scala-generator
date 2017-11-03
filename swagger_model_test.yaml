@@ -1,0 +1,83 @@
+swagger: "2.0"
+
+host: "dantest-service.does.not.matter"
+
+schemes: [ https ]
+
+info:
+  version: "1.0.0"
+  title: dan test service
+
+definitions:
+
+  DanTestEntity:
+      description: An entity with every type of property, created here to help test out our two-way serialization testing.
+      required:
+        - aString
+        - aBoolean
+        - aDate
+        - aDateTime
+        - aTimestamp
+        - aDouble
+        - aFloat
+        - anActualInteger
+        - anActualLong
+        - aMap
+        - anArray
+      properties:
+        aString:
+          type: string
+        aBoolean:
+          type: boolean
+        aDate:
+          type: string
+          format: date
+        aDateTime:
+          type: string
+          format: date-time
+        aTimestamp:
+          type: string
+          format: timestamp
+        aDouble:
+          type: number
+          format: double
+        aFloat:
+          type: number
+          format: float
+        anActualInteger:
+          type: integer
+          format: int32
+        anActualLong:
+          type: integer
+          format: int64
+        aMap:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+        anArray:
+          type: array
+          items:
+            type: string
+
+paths:
+
+  /mytest/url/path:
+      get:
+        operationId: getADanTestEntity
+        description: do nothing
+        parameters:
+        - name: testparam
+          in: path
+          description: The chapter the conversation is in
+          required: true
+          type: integer
+          format: int32
+        responses:
+            200:
+              description: Successful response
+              schema:
+                title: test title
+                $ref: "#/definitions/DanTestEntity"
