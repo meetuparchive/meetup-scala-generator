@@ -8,40 +8,39 @@ import {{invokerPackage}}.Serializer
 {{#imports}}import {{import}}
 {{/imports}}
 
-{{#models}}
-    {{#model}}
-        class {{classname}}Test extends FunSpec {
+{{#models}}{{#model}}
+class {{classname}}Test extends FunSpec {
 
-            describe("A {{classname}}") {
+    describe("A {{classname}}") {
 
-                it("should be serializable to JSON and back to an equivalent instance (options are Some)") {
+        it("should be serializable to JSON and back to an equivalent instance (options are Some)") {
 
-                    // Options on the entity are instantiated as Some(xyz)
-                    val testEntitySomes = {{classname}}(
-                    {{#vars}}
-                        {{name}} = {{>modelTestValuesPerTypeSome}}{{#hasMore}},{{/hasMore}}
-                    {{/vars}}
-                    )
+            // Options on the entity are instantiated as Some(xyz)
+            val testEntitySomes = {{classname}}(
+                {{#vars}}
+                    {{name}} = {{>modelTestValuesPerTypeSome}}{{#hasMore}},{{/hasMore}}
+                {{/vars}}
+            )
 
-                    // Options on the entity are instantiated as None
-                    val testEntityNones = {{classname}}(
-                    {{#vars}}
-                        {{name}} = {{>modelTestValuesPerTypeNone}}{{#hasMore}},{{/hasMore}}
-                    {{/vars}}
-                    )
+            // Options on the entity are instantiated as None
+            val testEntityNones = {{classname}}(
+                {{#vars}}
+                    {{name}} = {{>modelTestValuesPerTypeNone}}{{#hasMore}},{{/hasMore}}
+                {{/vars}}
+            )
 
-                    val entityList = List(testEntitySomes, testEntityNones)
+            val entityList = List(testEntitySomes, testEntityNones)
 
-                    entityList.foreach { entity =>
-                        val json = Serializer.serialize(entity)
-                        val either = Serializer.deserialize[{{classname}}](json)
-                        either.fold(
-                            err => fail(s"Failed to deserialize: $err"),
-                            deserializedEntity => assert(deserializedEntity == entity)
-                        )
-                    }
-                }
+            entityList.foreach { entity =>
+                val json = Serializer.serialize(entity)
+                System.out.println("serialized json for {{classname}}: \n\n" + json + "\n\n")
+                val either = Serializer.deserialize[{{classname}}](json)
+                either.fold(
+                    err => fail(s"Failed to deserialize: $err"),
+                    deserializedEntity => assert(deserializedEntity == entity)
+                )
             }
         }
-    {{/model}}
-{{/models}}
+    }
+}
+{{/model}}{{/models}}
