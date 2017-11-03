@@ -21,7 +21,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
 
     private static final String ARG_INCLUDE_SERIALIZATION = "includeSerialization";
     protected String sourceFolder = "src/main/scala";
-    protected String testSourceFolder = "src/main/test";
+    protected String testSourceFolder = "src/test/scala";
     protected String invokerPackage = "com.meetup";
     protected String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
 
@@ -285,7 +285,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
 
     @Override
     public final String modelTestFileFolder() {
-        return outputFolder + "/" + testSourceFolder + "/" + testPackage().replace('.', File.separatorChar);
+        return outputFolder + "/" + testSourceFolder + "/" + modelPackage().replace('.', File.separatorChar);
     }
 
     /**
