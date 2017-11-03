@@ -158,7 +158,34 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
         objs = postProcessModelsRefs(objs);
 
         // Now subject the models to Enum treatment.
-        return postProcessModelsEnum(objs);
+        return this.postProcessModelsEnum(objs);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> postProcessModelsEnum(Map<String, Object> objs) {
+        // first do the default enum handling that comes in DefaultCodegen
+        // this is a prereq to the custom handling we do next
+        objs = super.postProcessModelsEnum(objs);
+
+        // our own custom handling
+        // we get the first Enum's name and put it in an accessible place, so that it may be
+        // easily referenced in Mustache templates
+        List<Map> models = (List<Map>) objs.get("models");
+        for (Map map : models ) {
+            if (map.containsKey("model")) {
+                CodegenModel cm = (CodegenModel) map.get("model");
+                for (CodegenProperty prop : cm.vars) {
+                    if (prop.isEnum) {
+                        List<Map<String,String>> enumVars = (List<Map<String,String>>) prop.allowableValues.get("enumVars");
+                        Map<String,String> firstValMap = enumVars.isEmpty() ? new HashMap<>() : enumVars.get(0);
+                        String firstValName = firstValMap.containsKey("name") ? firstValMap.get("name") : "";
+                        prop.vendorExtensions.put("firstEnumName", firstValName);
+                    }
+                }
+            }
+        }
+        return objs;
     }
 
     /**

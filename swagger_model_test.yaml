@@ -26,6 +26,7 @@ definitions:
         - aMapSimple
         - aMapOfRefs
         - aReferenceToAnotherDefinition
+        - aStringEnum
       properties:
         aString:
           type: string
@@ -66,6 +67,11 @@ definitions:
               $ref: '#/definitions/TestMapItem'
         aReferenceToAnotherDefinition:
           $ref: '#/definitions/TestMapItem'
+        aStringEnum:
+          type: string
+          enum:
+            - apple
+            - orange
         anOptionString:
           type: string
         anOptionRef:
@@ -84,14 +90,14 @@ definitions:
 
 paths:
 
-  /mytest/url/path:
+  /mytest/url/path/{paramFoo}:
       get:
-        operationId: getADanTestEntity
-        description: do nothing
+        operationId: getTestEntity
+        description: Do nothing.  This is here because Swagger I think requires something in the "paths" section.
         parameters:
-        - name: testparam
+        - name: paramFoo
           in: path
-          description: The chapter the conversation is in
+          description: a parameter
           required: true
           type: integer
           format: int32
@@ -100,4 +106,4 @@ paths:
               description: Successful response
               schema:
                 title: test title
-                $ref: "#/definitions/DanTestEntity"
+                $ref: "#/definitions/TestEntity"
