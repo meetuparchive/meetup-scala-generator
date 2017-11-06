@@ -139,6 +139,8 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     @Override
     public final Map<String, Object> postProcessModels(Map<String, Object> objs) {
         // import sanitization lifted from ScalaClientCodegen
+        // this explicitly removes imports of classes in the same package
+        // leaving these imports in will cause build warnings
         @SuppressWarnings("unchecked")
         List<Map<String, String>> imports = (List<Map<String, String>>) objs.get("imports");
         final String prefix = modelPackage() + ".";
