@@ -39,6 +39,7 @@ libraryDependencies ++=
   )
 
 resolvers += "Meetup Bintray" at "https://dl.bintray.com/meetup/maven/"
+resolvers += Resolver.bintrayRepo("jeffmay", "maven")
 
 buildInfoKeys := Seq[BuildInfoKey](name, organization, version, scalaVersion, sbtVersion)
 
