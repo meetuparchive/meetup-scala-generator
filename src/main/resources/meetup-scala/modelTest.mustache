@@ -1,0 +1,32 @@
+package {{package}}
+
+{{! note: there aren't many model test templates we can use for reference, but the few there are will
+    be found by searching for filenames named 'model_test.mustache'. }}
+
+import org.scalatest.FunSpec;
+import {{invokerPackage}}.Serializer
+{{#imports}}import {{import}}
+{{/imports}}
+
+// see note in build.sbt about these scalacheck imports
+import org.scalacheck.{Arbitrary, Properties}
+import org.scalacheck.Prop.forAll
+import org.scalacheck.ScalacheckShapeless._
+import com.fortysevendeg.scalacheck.datetime.jdk8.ArbitraryJdk8.arbJdk8 // used for ZonedDateTime
+import org.scalacheck.ops.time.ImplicitJavaTimeGenerators.arbInstant // used for Instants
+
+{{#models}}{{#model}}
+class {{classname}}Test extends Properties("{{classname}}") {
+
+    property("two-way serialization") = forAll { (entity: {{classname}}) =>
+        //System.out.println("test {{classname}} entity: " + entity)
+        val json = Serializer.serialize(entity)
+        //System.out.println("serialized json for {{classname}}: " + json + "")
+        val either = Serializer.deserialize[{{classname}}](json)
+        either.fold(
+            err => { System.out.println(s"Failed to deserialize: $err"); false },
+            deserializedEntity => deserializedEntity == entity
+        )
+    }
+}
+{{/model}}{{/models}}

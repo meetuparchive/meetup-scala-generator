@@ -21,6 +21,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
 
     private static final String ARG_INCLUDE_SERIALIZATION = "includeSerialization";
     protected String sourceFolder = "src/main/scala";
+    protected String testSourceFolder = "src/test/scala";
     protected String invokerPackage = "com.meetup";
     protected String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
 
@@ -139,6 +140,8 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     @Override
     public final Map<String, Object> postProcessModels(Map<String, Object> objs) {
         // import sanitization lifted from ScalaClientCodegen
+        // explicitly removes imports of classes in the same package
+        // including these imports causes warnings
         @SuppressWarnings("unchecked")
         List<Map<String, String>> imports = (List<Map<String, String>>) objs.get("imports");
         final String prefix = modelPackage() + ".";
@@ -178,6 +181,11 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
     @Override
     public final String apiFileFolder() {
         return outputFolder + "/" + sourceFolder + "/" + apiPackage().replace('.', File.separatorChar);
+    }
+
+    @Override
+    public final String modelTestFileFolder() {
+        return outputFolder + "/" + testSourceFolder + "/" + modelPackage().replace('.', File.separatorChar);
     }
 
     /**

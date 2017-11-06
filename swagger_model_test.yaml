@@ -1,0 +1,144 @@
+swagger: "2.0"
+
+host: "model-for-two-way-serialization-testing.this.value.does.not.matter"
+
+schemes: [ https ]
+
+info:
+  version: "1.0.0"
+  title: model for two-way serialization testing
+
+definitions:
+
+  TestEntity:
+      description: An entity with with many types of property, created here to help test out our two-way serialization testing.
+      required:
+        - aString
+        - aBoolean
+        - aDouble
+        - aFloat
+        - anInteger
+        - aLong
+        # there's an outstanding bug around 'date' serialization https://meetup.atlassian.net/browse/MUP-16294
+        #- aDate
+        - aDateTime
+        - aTimestamp
+        - aReferenceEntity
+        - aReferenceOfReferenceEntity
+        - anArray
+        - anArrayOfReferenceEntities
+        - aMap
+        - aMapOfReferenceEntities
+        - aMapOfDateTimes
+        - aStringEnum
+        # see below, in "properties:" section, for Option fields
+      properties:
+        aString:
+          type: string
+        aBoolean:
+          type: boolean
+        aDouble:
+          type: number
+          format: double
+        aFloat:
+          type: number
+          format: float
+        anInteger:
+          type: integer
+          format: int32
+        aLong:
+          type: integer
+          format: int64
+        # there's an outstanding bug around 'date' serialization https://meetup.atlassian.net/browse/MUP-16294
+        #aDate:
+        #  type: string
+        #  format: date
+        aDateTime:
+          type: string
+          format: date-time
+        aTimestamp:
+          type: string
+          format: timestamp
+        aReferenceEntity:
+          $ref: '#/definitions/ReferenceEntity'
+        aReferenceOfReferenceEntity:
+          $ref: '#/definitions/ReferenceOfReferenceEntity'
+        anArray:
+          type: array
+          items:
+            type: string
+        anArrayOfReferenceEntities:
+          type: array
+          items:
+            $ref: '#/definitions/ReferenceEntity'
+        aMap:
+          type: object
+          additionalProperties:
+            type: string
+        aMapOfReferenceEntities:
+          type: object
+          additionalProperties:
+              $ref: '#/definitions/ReferenceEntity'
+        aMapOfDateTimes:
+          type: object
+          additionalProperties:
+            type: string
+            format: date-time
+        anOptionString:
+          type: string
+        anOptionMap:
+          type: object
+          additionalProperties:
+            type: string
+        anOptionOfAReferenceEntity:
+          $ref: '#/definitions/ReferenceEntity'
+        aStringEnum:
+          type: string
+          enum:
+            - apple
+            - orange
+
+  ReferenceEntity:
+    description: An object to use as a reference in TestEntity, to test that $ref is supported by our tests.
+    required:
+      - foo
+      - bar
+    properties:
+      foo:
+        type: string
+      bar:
+        type: string
+
+  ReferenceOfReferenceEntity:
+    description: An object containing a reference, to use as a reference in TestEntity, to test $refs of $ref are supported by our tests.
+    required:
+      - foo
+      - bar
+      - aReferenceEntity
+    properties:
+      foo:
+        type: string
+      bar:
+        type: string
+      aReferenceEntity:
+        $ref: '#/definitions/ReferenceEntity'
+
+paths:
+
+  /mytest/url/path/{paramFoo}:
+      get:
+        operationId: getTestEntity
+        description: Does nothing. This is here because Swagger requires something in the "paths" section.
+        parameters:
+        - name: paramFoo
+          in: path
+          description: a parameter
+          required: true
+          type: integer
+          format: int32
+        responses:
+            200:
+              description: Successful response
+              schema:
+                title: test title
+                $ref: "#/definitions/TestEntity"
