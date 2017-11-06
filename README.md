@@ -64,7 +64,7 @@ https://github.com/swagger-api/swagger-codegen/wiki/Mustache-Template-Variables
 
 You can generate a project from other codegens to assist in debugging and learning how this all works.  
 
-Looking in the `swagger-codegen` dependency, you'll see mustache templates for many other languages.  To find codegens that go with them, look to {{DefaultCodegen}} and see all the classes inheriting from it.
+Looking in the `swagger-codegen` dependency, you'll see mustache templates for many other languages.  To find codegens that go with them, look to `DefaultCodegen` and see all the classes inheriting from it.
 
 For example, the `Java Spring` project:
 
