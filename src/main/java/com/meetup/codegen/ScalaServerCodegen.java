@@ -22,8 +22,8 @@ public class ScalaServerCodegen extends BaseScalaCodegen {
                 ".scala");        // the extension for each file to write
 
         modelTestTemplateFiles.put(
-                "modelTestScalacheck.mustache", // the template to use
-                ".scala");                      // the extension for each file to write
+                "modelTest.mustache", // the template to use
+                ".scala");            // the extension for each file to write
 
         /*
          * Api classes.  You can write classes for each Api file with the apiTemplateFiles map.
