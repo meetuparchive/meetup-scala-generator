@@ -24,7 +24,18 @@ libraryDependencies ++=
     "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0",
     "com.meetup" %% "scala-logger" % "0.1.9",
     "io.reactivex" % "rxnetty" % "0.4.16",
-    "org.scalatest" %% "scalatest" % "2.2.6" % "test"
+    "org.scalatest" %% "scalatest" % "2.2.6" % "test",
+    ////// [start] libs needed for scalacheck-based property testing //////////////
+    // Note that both scalacheck-toolbox and scalacheck-ops have handling for java.time.
+    // Consequently there are potential conflicts between the two libs, if you're not careful about imports.
+    // We need support for java.time.Instant and ZonedDateTime:
+    // scalacheck-toolbox does not support java.time.Instant
+    // scalacheck-ops supports both in theory but has a bug for ZonedDateTime
+    // Hence we depend on both.
+    "com.github.alexarchambault" % "scalacheck-shapeless_1.13_2.11" % "1.1.7" % "test",
+    "com.47deg" %% "scalacheck-toolbox-datetime" % "0.2.3" % "test",
+    "me.jeffmay" % "scalacheck-ops_1-13_2.11" % "1.5.0" % "test"
+    ////// [end] libs needed for scalacheck-based property testing //////////////
   )
 
 resolvers += "Meetup Bintray" at "https://dl.bintray.com/meetup/maven/"
