@@ -49,6 +49,30 @@ which is included in the same directory for convenience.
 
 Now you can poke around the generated source in the `generated` directory.
 
+### Debugging
+
+#### -DdebugModels
+
+You can pass in the `-DdebugModels` to get a printout of the variables available to the mustache templates:
+
+`JVM_ARGS=-DdebugModels CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-server -o generated`
+
+For a bit more about this:
+https://github.com/swagger-api/swagger-codegen/wiki/Mustache-Template-Variables
+
+#### Generating from other projects
+
+You can generate a project from other codegens to assist in debugging and learning how this all works.  
+
+Looking in the `swagger-codegen` dependency, you'll see mustache templates for many other languages.  To find codegens that go with them, look to `DefaultCodegen` and see all the classes inheriting from it.
+
+For example, the `Java Spring` project:
+
+`CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i your_swagger_yaml_here.yaml -l spring -o an-output-directory`
+
+(The `-l` param is gotten from the `getName` method in the codegen.)
+
+
 ## Models and JSON
 
 In addition to generating models, the generator also generates bidirectional JSON codecs for each.
