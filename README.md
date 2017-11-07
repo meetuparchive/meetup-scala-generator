@@ -34,7 +34,7 @@ Assuming we get a pod name of `plan-service-896393671-ea03g`, start up the forwa
 Be careful! Currently this is "production".
 
 ### Generate a server
-`CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-server -o generated`
+```CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-server -o generated```
 
 The name of the runnable Main object or objects generated is based on the tags used in the swagger definition file.  The swagger
 generator groups together API endpoints into separate classfiles based on their tags.  If no tags are used, a `DefaultApiMain`
@@ -55,7 +55,7 @@ Now you can poke around the generated source in the `generated` directory.
 
 You can pass in the `-DdebugModels` to get a printout of the variables available to the mustache templates:
 
-`JVM_ARGS=-DdebugModels CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-server -o generated`
+```JVM_ARGS=-DdebugModels CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i swagger.yaml -l meetup-scala-server -o generated```
 
 For a bit more about this:
 https://github.com/swagger-api/swagger-codegen/wiki/Mustache-Template-Variables
@@ -68,7 +68,7 @@ Looking in the `swagger-codegen` dependency, you'll see mustache templates for m
 
 For example, the `Java Spring` project:
 
-`CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i your_swagger_yaml_here.yaml -l spring -o an-output-directory`
+```CP=target/meetup-scala-generator-`make version`.jar swagger-codegen/swagger-codegen generate -i your_swagger_yaml_here.yaml -l spring -o an-output-directory```
 
 (The `-l` param is gotten from the `getName` method in the codegen.)
 
