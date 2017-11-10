@@ -39,8 +39,6 @@ public class ScalaServerCodegen extends BaseScalaCodegen {
     public void processOpts() {
         super.processOpts();
 
-        supportingFiles.add(new SupportingFile("server/build.sbt.mustache", "build.sbt"));
-        supportingFiles.add(new SupportingFile("server/build.properties.mustache", "project/build.properties"));
         supportingFiles.add(new SupportingFile("server/plugins.sbt.mustache", "project/plugins.sbt"));
         supportingFiles.add(new SupportingFile("server/Makefile.mustache", "Makefile"));
         supportingFiles.add(new SupportingFile("server/Service.mustache", invokerFolder, "Service.scala"));
