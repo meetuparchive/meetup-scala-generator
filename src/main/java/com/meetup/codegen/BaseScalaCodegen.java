@@ -20,9 +20,8 @@ import java.util.*;
 abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig {
 
     private static final String ARG_INCLUDE_SERIALIZATION = "includeSerialization";
-    protected String sourceFolder = "src/main/scala";
     protected String invokerPackage = "com.meetup";
-    protected String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
+    protected String invokerFolder = invokerPackage.replace(".", "/");
 
     private static final Set<String> NUMBER_TYPES =
             new HashSet<>(Arrays.asList("Int", "Long", "Float", "Double"));
@@ -118,7 +117,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
         modelPackage = invokerPackage + ".model";
         apiPackage = invokerPackage + ".api";
 
-        invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
+        invokerFolder = invokerPackage.replace(".", "/");
 
         Object incSer = additionalProperties.get(ARG_INCLUDE_SERIALIZATION);
         final boolean includeSerialization = incSer == null || Boolean.TRUE.toString().equals(incSer);
@@ -170,7 +169,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
      * instantiated
      */
     public final String modelFileFolder() {
-        return outputFolder + "/" + sourceFolder + "/" + modelPackage().replace('.', File.separatorChar);
+        return outputFolder + "/" + modelPackage().replace('.', File.separatorChar);
     }
 
     /**
@@ -179,7 +178,7 @@ abstract class BaseScalaCodegen extends DefaultCodegen implements CodegenConfig 
      */
     @Override
     public final String apiFileFolder() {
-        return outputFolder + "/" + sourceFolder + "/" + apiPackage().replace('.', File.separatorChar);
+        return outputFolder + "/" + apiPackage().replace('.', File.separatorChar);
     }
 
     /**
