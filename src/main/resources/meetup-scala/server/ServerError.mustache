@@ -1,0 +1,11 @@
+package {{invokerPackage}}
+
+sealed trait ServerError {
+  val msg: String
+}
+
+object ServerError {
+  case object InvalidParameterType(paramName: String, paramType: String) extends ServerError {
+    final val msg: String = s"Parameter $paramName could not be converted to a $paramType."
+  }
+}

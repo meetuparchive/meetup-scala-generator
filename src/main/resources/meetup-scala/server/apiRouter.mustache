@@ -9,7 +9,7 @@ import io.reactivex.netty.protocol.http.server.{HttpServerRequest, HttpServerRes
 
 import io.netty.handler.codec.http.{HttpHeaderNames, HttpResponseStatus}
 
-import {{invokerPackage}}.{Router, Serializer, Codec, Service, Util}
+import {{invokerPackage}}.{Router, Serializer, Codec, Service, Util, ServerError, ParameterValue}
 
 import java.nio.charset.Charset
 
@@ -34,6 +34,8 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
         {{#isFormParam}}/* form param: {{paramName}} */
         val param_{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}} = {{^required}}Option({{/required}}param_form.get("{{paramName}}"){{^required}}).map(_{{/required}}.get(0).to{{dataType}}{{^required}}){{/required}}{{/isFormParam}}
         {{/allParams}}
+
+        val unwrappedParams: Map[String, Either[ServerError, ParameterValue]]
 
         val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}({{#allParams}}param_{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
         respond(result, response)

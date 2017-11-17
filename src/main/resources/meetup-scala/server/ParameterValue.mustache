@@ -1,0 +1,24 @@
+package {{invokerPackage}}
+
+sealed trait ParameterValue {
+  val value: Any
+  def apply(rawValue: String): ParameterValue
+}
+
+object ParameterValue {
+  class StringValue extends ParameterValue {
+    val value: String
+
+    override def apply(rawValue: String): StringValue {
+      value = rawValue.toString
+    }
+  }
+
+  class IntValue extends ParameterValue {
+    val value: Int
+
+    override def apply(rawValue: String): IntValue {
+      value = rawValue.toInt
+    }
+  }
+}
