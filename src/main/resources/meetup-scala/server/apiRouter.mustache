@@ -28,14 +28,18 @@ class {{classname}}Router(api: {{classname}}) extends Router(api) {
         {{#hasQueryParams}}val queryParams = request.getQueryParameters{{/hasQueryParams}}
         {{#allParams}}
         {{#isPathParam}}/* path param: {{paramName}} */
-        val param_{{paramName}}: {{dataType}} = {{paramName}}.to{{dataType}}{{/isPathParam}}
-        {{#isQueryParam}}/* query param: {{paramName}} */
-        val param_{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}} = {{^required}}Option({{/required}}queryParams.get("{{paramName}}"){{^required}}).map(_{{/required}}.get(0).to{{dataType}}{{^required}}){{/required}}{{/isQueryParam}}
+        val param_{{paramName}}: {{dataType}}Value = {{dataType}}Value({{paramName}}){{/isPathParam}}
+        {{#isQueryParam}}/* query param: {{paramName}}Value */
+        val param_{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}} = {{^required}}Option({{/required}}queryParams.get("{{paramName}}"){{^required}}).map({{dataType}}Value(_{{/required}}.get(0)){{^required}}){{/required}}{{/isQueryParam}}
         {{#isFormParam}}/* form param: {{paramName}} */
         val param_{{paramName}}: {{^required}}Option[{{/required}}{{dataType}}{{^required}}]{{/required}} = {{^required}}Option({{/required}}param_form.get("{{paramName}}"){{^required}}).map(_{{/required}}.get(0).to{{dataType}}{{^required}}){{/required}}{{/isFormParam}}
         {{/allParams}}
 
-        val unwrappedParams: Map[String, Either[ServerError, ParameterValue]]
+        val unwrappedParams: Map[String, ParameterValue] = Map({{#allParams}}"{{paramName}}" -> param_{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
+
+        val errors: List[ServerError] = unwrappedParams.values.collect {
+          case v if v.value.isLeft => InvalidParameterType(???, v.value.left.get.paramType)
+        }
 
         val result: {{#returnType}}{{returnType}}{{/returnType}}{{^returnType}}Unit{{/returnType}} = api.{{operationId}}({{#allParams}}param_{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
         respond(result, response)

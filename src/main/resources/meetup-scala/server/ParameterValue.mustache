@@ -1,24 +1,32 @@
 package {{invokerPackage}}
 
 sealed trait ParameterValue {
-  val value: Any
   def apply(rawValue: String): ParameterValue
 }
 
-object ParameterValue {
-  class StringValue extends ParameterValue {
-    val value: String
+abstract class ParameterValue {
+  def value: Either[InvalidParameterType, Any]
+}
 
-    override def apply(rawValue: String): StringValue {
-      value = rawValue.toString
+object ParameterValue {
+  case class StringValue(val value: Either[InvalidParameterType, String]) extends ParameterValue
+  object StringValue extends ParameterValue {
+    override def apply(rawValue: String): StringValue = {
+      StringValue(Right(rawValue))
     }
   }
 
-  class IntValue extends ParameterValue {
-    val value: Int
-
-    override def apply(rawValue: String): IntValue {
-      value = rawValue.toInt
+  case class IntValue(val value: Either[InvalidParameterType, Int]) extends ParameterValue
+  object IntValue extends ParameterValue {
+    override def apply(rawValue: String): IntValue = {
+      try {
+        val value = Right(rawValue.toInt)
+      } catch {
+        case e: Exception => val value = Left(InvalidParameterError("Int"))
+      }
+      IntValue(value)
     }
   }
 }
+
+case object InvalidParameterError(paramType: String)
