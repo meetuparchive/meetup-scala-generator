@@ -169,8 +169,7 @@ In the generated code, the method accepts required params before optional ones. 
 The OpenAPI specification defers to the [JSON-Schema Draft 4] for its treatment of [`enum`](http://json-schema.org/latest/json-schema-validation.html#anchor76).
 We currently support both standalone definitions defined as enums themselves as well as inline enums.
 
-Enum values must be heterogeneous. Supported value types are a subset of that allowed in JSON-schema, for simplicity's sake.
-Specifically, these are: `boolean`, `integer`, `number`, and `string`.
+All values of an enum must be of the same type. Supported value types are a subset of those allowed in JSON-schema: `boolean`, `integer`, `number`, and `string`.
 
 The code generation strategy for both standalone and embedded enums is the same:
 
