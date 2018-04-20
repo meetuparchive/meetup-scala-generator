@@ -10,7 +10,7 @@ TARGET ?= __package-sbt
 
 VERSION ?= 2.5.$(CI_BUILD_NUMBER)
 
-BUILDER_TAG = "meetup/sbt-builder:0.1.5"
+BUILDER_TAG = "meetup/sbt-builder:0.1.7"
 
 # lists all available targets
 list:
