@@ -16,8 +16,10 @@ if [ -x $JAVA ]; then
 	major=${BASH_REMATCH[1]}
 	minor=${BASH_REMATCH[2]}
 	if [ $major != 1 -o $minor -lt 7 ]; then
-	    echo "Unacceptable java version ($java_version)!"
-	    exit 1
+	    if [ $major -lt 9 ]; then
+	        echo "Unacceptable java version ($java_version)!"
+		exit 1
+	    fi
 	fi
     fi
 else
