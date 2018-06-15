@@ -48,6 +48,7 @@ A_PATH=$A_DIR/$A_NAME-$A_VERSION.jar
 GEN_DIR=generated-$GEN_ARG
 BUILD_OUT=$TMPDIR/generated-build-$RANDOM.out
 
+rm -rf $GEN_DIR
 echo "  -> Running the code generator ..."
 CP=$A_PATH $CODEGEN generate -i $SWAGGER_SPEC -l $GEN_NAME -o $GEN_DIR > $BUILD_OUT 2>&1
 RES=$?
@@ -72,7 +73,10 @@ if [ "$GEN_ARG" = "client" ]; then
   
   libraryDependencies ++= Seq("org.json4s" %% "json4s-native" % "3.4.0", "com.squareup.okhttp3" % "okhttp" % "3.5.0", "com.meetup" %% "json4s-java-time" % "0.0.6")
 
-  resolvers += Resolver.bintrayRepo("meetup", "maven")' > $GEN_DIR/build.sbt  
+  resolvers += Resolver.bintrayRepo("meetup", "maven")' > $GEN_DIR/build.sbt
+
+  mkdir -p $GEN_DIR/src/main/scala
+  mv $GEN_DIR/com $GEN_DIR/src/main/scala
 fi
 
 echo "  -> Attempting to build the generated code ..."

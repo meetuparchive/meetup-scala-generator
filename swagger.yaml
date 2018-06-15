@@ -50,6 +50,8 @@ definitions:
       modifyTime:
         type: string
         format: timestamp
+      type:
+        type: string
 
 
   ConversationPostParams:
