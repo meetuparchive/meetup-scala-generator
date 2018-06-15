@@ -74,10 +74,10 @@ if [ "$GEN_ARG" = "client" ]; then
   libraryDependencies ++= Seq("org.json4s" %% "json4s-native" % "3.4.0", "com.squareup.okhttp3" % "okhttp" % "3.5.0", "com.meetup" %% "json4s-java-time" % "0.0.6")
 
   resolvers += Resolver.bintrayRepo("meetup", "maven")' > $GEN_DIR/build.sbt
-fi
 
-mkdir -p $GEN_DIR/src/main/scala
-mv $GEN_DIR/com $GEN_DIR/src/main/scala
+  mkdir -p $GEN_DIR/src/main/scala
+  mv $GEN_DIR/com $GEN_DIR/src/main/scala
+fi
 
 echo "  -> Attempting to build the generated code ..."
 pushd $GEN_DIR > /dev/null
