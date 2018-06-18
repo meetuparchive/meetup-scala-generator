@@ -35,7 +35,9 @@ trait Runner {
 
     val (service, doShutdownService) = initializeService(sys.env, args)
     setInitialReadiness()
-    val (server, doShutdownServer) = Server(9000, service)
+
+    val port = sys.env.get("SERVER_PORT").map(_.toInt).getOrElse(9000)
+    val (server, doShutdownServer) = Server(port, service)
 
     if (Thread.currentThread().getName.startsWith("run-main-")) {
       /* We're running under SBT so stay attached to the terminal and shutdown
