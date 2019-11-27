@@ -1,4 +1,18 @@
+# Meetup Scala service generator based on OpenAPI spec <!-- omit in toc -->
+
 [![Build Status](https://travis-ci.org/meetup/meetup-scala-generator.svg?branch=master)](https://travis-ci.org/meetup/meetup-scala-generator)
+
+- [Development](#development)
+- [Running the Code Generator](#running-the-code-generator)
+  - [Generate a client](#generate-a-client)
+  - [Debugging](#debugging)
+    - [-DdebugModels](#ddebugmodels)
+- [Models and JSON](#models-and-json)
+- [Interpretation of the OpenAPI Specification](#interpretation-of-the-openapi-specification)
+  - [Order of Parameters](#order-of-parameters)
+  - [Treatment of `enum`](#treatment-of-enum)
+  - [Handling Subtype Polymorphism](#handling-subtype-polymorphism)
+- [Additional Date and Time Types](#additional-date-and-time-types)
 
 ## Development
 
@@ -62,7 +76,7 @@ https://github.com/swagger-api/swagger-codegen/wiki/Mustache-Template-Variables
 
 #### Generating from other projects
 
-You can generate a project from other codegens to assist in debugging and learning how this all works.  
+You can generate a project from other codegens to assist in debugging and learning how this all works.
 
 Looking in the `swagger-codegen` dependency, you'll see mustache templates for many other languages.  To find codegens that go with them, look to `DefaultCodegen` and see all the classes inheriting from it.
 
