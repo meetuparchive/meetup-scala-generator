@@ -10,7 +10,7 @@ crossPaths := false
 
 autoScalaLibrary := false
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.11.12"
 
 javacOptions in doc := Seq("-encoding", "UTF-8")
 

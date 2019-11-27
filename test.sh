@@ -69,8 +69,8 @@ fi
 # via compilation.
 
 if [ "$GEN_ARG" = "client" ]; then
-  echo 'scalaVersion := "2.11.8"
-  
+  echo 'scalaVersion := "2.11.12"
+
   libraryDependencies ++= Seq("org.json4s" %% "json4s-native" % "3.4.0", "com.squareup.okhttp3" % "okhttp" % "3.5.0", "com.meetup" %% "json4s-java-time" % "0.0.6")
 
   resolvers += Resolver.bintrayRepo("meetup", "maven")' > $GEN_DIR/build.sbt
