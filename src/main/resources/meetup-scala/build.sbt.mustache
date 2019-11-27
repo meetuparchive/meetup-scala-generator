@@ -3,7 +3,7 @@ lazy val root = (project in file(".")).
         version       := "{{clientVersion}}",
         name          := "{{clientName}}",
         organization  := "{{clientOrganization}}",
-        scalaVersion  := "2.11.8")
+        scalaVersion  := "2.11.12")
 
 initialCommands := "import {{invokerPackage}}._; import {{apiPackage}}._; import {{modelPackage}}._"
 
